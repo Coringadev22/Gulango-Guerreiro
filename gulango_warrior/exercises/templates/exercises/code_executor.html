@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gulango Warrior - Terminal de Código</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            background: #f9f9f9;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 16px;
+        }
+        pre {
+            background: #222;
+            color: #0f0;
+            padding: 15px;
+            white-space: pre-wrap;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #008cff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        h2, h3 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h2>Escreva seu código Python:</h2>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="code" placeholder="Digite seu código aqui...">{{ code }}</textarea><br><br>
+        <button type="submit">Executar</button>
+    </form>
+
+    {% if output %}
+        <h3>Saída:</h3>
+        <pre>{{ output }}</pre>
+    {% endif %}
+</body>
+</html>
