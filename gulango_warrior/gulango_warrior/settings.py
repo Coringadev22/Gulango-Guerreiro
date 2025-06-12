@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'exercises',
     'progress',
     'avatars',
+    'marketplace',
 ]
 
 MIDDLEWARE = [
