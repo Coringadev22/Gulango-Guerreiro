@@ -1,14 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Perfil do Avatar</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(#5d473a, #3b2f2f);
+            color: #f8f5f2;
+            font-family: "Georgia", serif;
+        }
+
+        .perfil-card {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 5px solid #d4af37;
+            border-radius: 10px;
+        }
+
+        .perfil-card img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #d4af37;
+            margin-bottom: 15px;
+        }
+
+        .perfil-card h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .perfil-card p {
+            margin: 5px 0;
+            font-size: 1.2em;
+        }
+    </style>
 </head>
 <body>
-    <h1>Perfil do Avatar</h1>
-    <img src="{{ avatar.imagem.url }}" alt="Avatar" />
-    <p>Classe: {{ avatar.classe }}</p>
-    <p>Nível: {{ avatar.nivel }}</p>
-    <p>XP Total: {{ avatar.xp_total }}</p>
-    <p>Moedas: {{ avatar.moedas }}</p>
+    <div class="perfil-card">
+        <img src="{{ avatar.imagem.url }}" alt="Avatar">
+        <h1>{{ avatar.user.username }}</h1>
+        <p>Classe: {{ avatar.classe }}</p>
+        <p>Nível: {{ avatar.nivel }}</p>
+        <p>XP Total: {{ avatar.xp_total }}</p>
+        <p>Moedas: {{ avatar.moedas }}</p>
+    </div>
 </body>
 </html>
