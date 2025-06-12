@@ -17,10 +17,17 @@ class Avatar(models.Model):
     moedas = models.IntegerField(default=0)
 
     def ganhar_xp(self, quantidade: int) -> None:
+        """Incrementa o XP do avatar e verifica conquistas."""
+
         self.xp_total += quantidade
         while self.xp_total >= self.nivel * 100:
             self.nivel += 1
         self.save()
+
+        # Importação tardia para evitar dependência circular
+        from progress.utils import verificar_conquistas
+
+        verificar_conquistas(self)
 
     def __str__(self) -> str:
         return f"{self.user.username} - Nível {self.nivel}"
