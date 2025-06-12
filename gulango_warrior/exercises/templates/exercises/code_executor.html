@@ -30,6 +30,17 @@
         h2, h3 {
             color: #333;
         }
+
+        /* Estilo de notificação medieval */
+        .medieval-notification {
+            background-color: #fdf5e6;
+            border: 3px solid #a52a2a;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Times New Roman', serif;
+            color: #333;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -46,7 +57,7 @@
     {% endif %}
 
     {% if xp_message %}
-        <p>{{ xp_message }}</p>
+        <div class="medieval-notification">{{ xp_message }}</div>
     {% endif %}
 </body>
 </html>
