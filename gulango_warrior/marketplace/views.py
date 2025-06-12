@@ -26,7 +26,7 @@ def loja_view(request):
             request.session["mensagem_loja"] = "Item comprado com sucesso!"
         else:
             request.session["mensagem_loja"] = "Você não pode comprar este item."
-        return redirect("loja_view")
+        return redirect("loja")
 
     context = {
         "itens": itens,
