@@ -20,14 +20,14 @@ class LojaViewTests(TestCase):
 
     def test_loja_get(self):
         self.client.login(username="player", password="123")
-        response = self.client.get(reverse("loja_view"))
+        response = self.client.get(reverse("loja"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.item.nome)
 
     def test_comprar_item_sucesso(self):
         self.client.login(username="player", password="123")
-        response = self.client.post(reverse("loja_view"), {"item_id": self.item.id})
-        self.assertRedirects(response, reverse("loja_view"))
+        response = self.client.post(reverse("loja"), {"item_id": self.item.id})
+        self.assertRedirects(response, reverse("loja"))
         self.avatar.refresh_from_db()
         self.assertEqual(self.avatar.moedas, 20)
         self.assertEqual(CompraItem.objects.count(), 1)
