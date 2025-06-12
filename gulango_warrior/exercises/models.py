@@ -6,4 +6,5 @@ class Exercise(models.Model):
     question_text = models.TextField()
     correct_answer = models.TextField()
     answer_type = models.CharField(max_length=20, choices=[('code', 'Code'), ('quiz', 'Quiz')])
+    xp_recompensa = models.IntegerField(default=10)
     
