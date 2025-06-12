@@ -17,3 +17,16 @@ class Conquista(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class AvatarConquista(models.Model):
+    avatar = models.ForeignKey(
+        'avatars.Avatar', on_delete=models.CASCADE
+    )
+    conquista = models.ForeignKey(
+        Conquista, on_delete=models.CASCADE
+    )
+    data_desbloqueio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.avatar} - {self.conquista}"
