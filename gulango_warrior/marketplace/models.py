@@ -17,3 +17,12 @@ class Item(models.Model):
 
     def __str__(self) -> str:
         return self.nome
+
+
+class CompraItem(models.Model):
+    avatar = models.ForeignKey('avatars.Avatar', on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    data_compra = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.avatar.user.username} comprou {self.item.nome}"
