@@ -8,3 +8,12 @@ class LessonProgress(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
 
 
+
+class Conquista(models.Model):
+    nome = models.CharField(max_length=100)
+    descricao = models.TextField()
+    icone = models.ImageField(upload_to='conquistas/')
+    condicao = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nome
