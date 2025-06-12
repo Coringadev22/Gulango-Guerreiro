@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Loja</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            background: #f9f9f9;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        img {
+            max-width: 200px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Loja</h1>
+    <p>Moedas: {{ avatar.moedas }}</p>
+
+    {% if mensagem %}
+        <p>{{ mensagem }}</p>
+    {% endif %}
+
+    <ul>
+        {% for item in itens %}
+            <li>
+                <h2>{{ item.nome }}</h2>
+                <img src="{{ item.imagem.url }}" alt="{{ item.nome }}">
+                <p>{{ item.descricao }}</p>
+                <p>Preço: {{ item.preco }}</p>
+                <p>Classe permitida: {{ item.classe_restrita }}</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit">Comprar</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
