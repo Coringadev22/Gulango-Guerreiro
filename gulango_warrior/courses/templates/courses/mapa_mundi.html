@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mapa Mundi</title>
+</head>
+<body>
+    <h1>Mapa Mundi</h1>
+    <ul>
+        {% for info in cursos %}
+        <li>
+            {{ info.curso.title }} -
+            {% if info.concluido %}
+                Concluído
+            {% elif info.iniciado %}
+                Em progresso ({{ info.concluidas }}/{{ info.total }})
+            {% else %}
+                Não iniciado
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
