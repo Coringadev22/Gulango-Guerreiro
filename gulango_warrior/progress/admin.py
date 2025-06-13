@@ -9,6 +9,7 @@ from .models import (
     AvatarConquista,
     MissaoDiaria,
     UsuarioMissao,
+    ProgressoPorLinguagem,
 )
 
 admin.site.register(LessonProgress)
@@ -64,3 +65,4 @@ class MissaoDiariaAdmin(admin.ModelAdmin):
     duplicate_selected.short_description = "Duplicar missões selecionadas"
 
 admin.site.register(UsuarioMissao)
+admin.site.register(ProgressoPorLinguagem)

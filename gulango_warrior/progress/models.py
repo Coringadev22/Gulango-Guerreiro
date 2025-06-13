@@ -79,3 +79,25 @@ class Notificacao(models.Model):
 
     def __str__(self) -> str:
         return self.titulo
+
+
+class ProgressoPorLinguagem(models.Model):
+    """Rastreia o progresso do usuário em cada linguagem."""
+
+    LING_GOLANG = "golang"
+    LING_RUST = "rust"
+    LING_JULIA = "julia"
+
+    LINGUAGEM_CHOICES = [
+        (LING_GOLANG, "golang"),
+        (LING_RUST, "rust"),
+        (LING_JULIA, "julia"),
+    ]
+
+    usuario = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
+    linguagem = models.CharField(max_length=20, choices=LINGUAGEM_CHOICES)
+    xp_total = models.IntegerField()
+    nivel = models.IntegerField()
+
+    def __str__(self) -> str:  # pragma: no cover - simples representacao
+        return f"{self.usuario} - {self.linguagem}"
