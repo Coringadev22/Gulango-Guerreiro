@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'progress',
     'avatars',
     'marketplace',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
