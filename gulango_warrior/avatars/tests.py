@@ -63,3 +63,50 @@ class SkinUsuarioModelTests(TestCase):
 
         self.assertTrue(SkinUsuario.objects.filter(id=skin_usuario.id).exists())
         self.assertEqual(str(skin_usuario), "u - Robe Vermelho")
+
+class TrocarSkinTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="skin", password="123")
+        Avatar.objects.create(user=self.user)
+        self.skin1 = SkinVisual.objects.create(
+            nome="Azul",
+            tipo=SkinVisual.TIPO_AVATAR,
+            imagem="skins/a.png",
+            preco_moedas=0,
+            classe_restrita="todas",
+        )
+        self.skin2 = SkinVisual.objects.create(
+            nome="Vermelha",
+            tipo=SkinVisual.TIPO_AVATAR,
+            imagem="skins/b.png",
+            preco_moedas=0,
+            classe_restrita="todas",
+        )
+
+    def test_trocar_skin_altera_em_uso(self):
+        from .utils import trocar_skin
+
+        SkinUsuario.objects.create(usuario=self.user, skin=self.skin1, em_uso=True)
+        SkinUsuario.objects.create(usuario=self.user, skin=self.skin2, em_uso=False)
+
+        trocar_skin(self.user, SkinVisual.TIPO_AVATAR, self.skin2.id)
+
+        skin1 = SkinUsuario.objects.get(usuario=self.user, skin=self.skin1)
+        skin2 = SkinUsuario.objects.get(usuario=self.user, skin=self.skin2)
+        self.assertFalse(skin1.em_uso)
+        self.assertTrue(skin2.em_uso)
+
+    def test_trocar_skin_cria_registro(self):
+        from .utils import trocar_skin
+
+        SkinUsuario.objects.create(usuario=self.user, skin=self.skin1, em_uso=True)
+
+        trocar_skin(self.user, SkinVisual.TIPO_AVATAR, self.skin2.id)
+
+        self.assertTrue(
+            SkinUsuario.objects.filter(usuario=self.user, skin=self.skin2, em_uso=True).exists()
+        )
+        self.assertFalse(
+            SkinUsuario.objects.get(usuario=self.user, skin=self.skin1).em_uso
+        )
+
