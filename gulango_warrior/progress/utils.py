@@ -4,12 +4,19 @@ from __future__ import annotations
 
 from datetime import date
 from typing import Dict, Any, Optional
+import os
+
+try:
+    import openai
+except Exception:  # openai not installed
+    openai = None
 
 from .models import (
     Conquista,
     AvatarConquista,
     MissaoDiaria,
     UsuarioMissao,
+    LessonProgress,
 )
 from avatars.models import Avatar
 
@@ -83,3 +90,53 @@ def verificar_missoes_automaticas(
             avatar.save()
             usuario_missao.concluida = True
             usuario_missao.save()
+
+
+def gerar_feedback_ia(avatar: Avatar) -> str:
+    """Gera uma mensagem de feedback em tom medieval via OpenAI.
+
+    A função coleta informações do avatar e retorna elogios, dicas e
+    orientações para a próxima jornada. Se a API da OpenAI não estiver
+    disponível ou ocorrer qualquer erro, uma resposta padrão é retornada.
+    """
+
+    if openai is None:
+        return "Não posso falar agora, jovem aventureiro."
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return "API key não configurada."
+
+    openai.api_key = api_key
+
+    conquistas = AvatarConquista.objects.filter(avatar=avatar).select_related(
+        "conquista"
+    )
+    nomes_conquistas = [ac.conquista.nome for ac in conquistas]
+
+    exercicios_resolvidos = LessonProgress.objects.filter(
+        user=avatar.user, completed=True
+    ).count()
+
+    system_prompt = (
+        "Você é um mestre medieval que orienta jovens heróis em sua jornada. "
+        "Elogie seus feitos, ofereça dicas breves e indique o caminho para a "
+        "próxima aventura. Responda em português."
+    )
+    user_content = (
+        f"XP atual: {avatar.xp_total}\n"
+        f"Exercícios resolvidos: {exercicios_resolvidos}\n"
+        f"Conquistas: {', '.join(nomes_conquistas) if nomes_conquistas else 'nenhuma'}"
+    )
+
+    try:
+        resposta = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content},
+            ],
+        )
+        return resposta.choices[0].message.content.strip()
+    except Exception:
+        return "O oráculo silenciou-se por ora. Volte mais tarde."
