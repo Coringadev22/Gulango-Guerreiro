@@ -1,7 +1,11 @@
 from datetime import date
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from avatars.models import Avatar
 from .models import (
@@ -11,6 +15,7 @@ from .models import (
     AvatarConquista,
     ProgressoPorLinguagem,
     LessonProgress,
+    Duelo,
 )
 from .utils import _avaliar_condicao, gerar_feedback_ia
 
@@ -158,4 +163,33 @@ def validar_certificado(request, codigo_validacao: str):
     )
     context = {"certificado": certificado}
     return render(request, "progress/validar_certificado.html", context)
+
+
+class duelos_usuario(APIView):
+    """Retorna os duelos em que o usuário participou."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        duelos = (
+            Duelo.objects.filter(Q(jogador_1=request.user) | Q(jogador_2=request.user))
+            .select_related("jogador_1", "jogador_2", "vencedor")
+            .order_by("-data_inicio")
+        )
+
+        resultados = []
+        for duelo in duelos:
+            adversario = (
+                duelo.jogador_2 if duelo.jogador_1 == request.user else duelo.jogador_1
+            )
+            venceu = duelo.vencedor == request.user
+            resultados.append(
+                {
+                    "adversario": adversario.username,
+                    "status": duelo.status,
+                    "data": duelo.data_inicio.isoformat(),
+                    "venceu": venceu,
+                }
+            )
+        return Response(resultados)
 

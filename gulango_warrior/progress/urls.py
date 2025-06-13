@@ -6,6 +6,7 @@ from .views import (
     painel_linguagens,
     emitir_certificado,
     ver_certificado,
+    duelos_usuario,
 )
 
 urlpatterns = [
@@ -24,4 +25,5 @@ urlpatterns = [
         ver_certificado,
         name="ver_certificado",
     ),
+    path("duelos/", duelos_usuario.as_view(), name="duelos_usuario"),
 ]
