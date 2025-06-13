@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mapa dos Cursos</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif;
+        }
+        .map-container {
+            position: relative;
+            width: 100%;
+            min-height: 600px;
+            background: url('https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg') no-repeat center center;
+            background-size: cover;
+        }
+        .course-marker {
+            position: absolute;
+            text-align: center;
+            transform: translate(-50%, -50%);
+        }
+        .course-marker img.status-icon {
+            width: 40px;
+            height: 40px;
+        }
+        .course-marker span {
+            display: block;
+            margin-top: 4px;
+            color: #f0e6d6;
+            text-shadow: 1px 1px 2px #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        {% for course in courses %}
+            {% if course.regiao == 'floresta_de_go' %}
+                {% with left='25%' top='35%' %}
+            {% elif course.regiao == 'fortaleza_rustica' %}
+                {% with left='70%' top='40%' %}
+            {% elif course.regiao == 'planicies_julianas' %}
+                {% with left='45%' top='70%' %}
+            {% else %}
+                {% with left='50%' top='50%' %}
+            {% endif %}
+            <div class="course-marker" style="left:{{ left }}; top:{{ top }};">
+                {% if course.status == 'nao_iniciado' %}
+                    <img class="status-icon" src="https://cdn-icons-png.flaticon.com/512/2515/2515186.png" alt="Não iniciado">
+                {% elif course.status == 'em_andamento' %}
+                    <img class="status-icon" src="https://cdn-icons-png.flaticon.com/512/2515/2515183.png" alt="Em andamento">
+                {% else %}
+                    <img class="status-icon" src="https://cdn-icons-png.flaticon.com/512/2166/2166692.png" alt="Concluído">
+                {% endif %}
+                <span>{{ course.title }}</span>
+            </div>
+            {% endwith %}
+        {% empty %}
+            <p style="color: white; padding: 20px;">Nenhum curso disponível.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
