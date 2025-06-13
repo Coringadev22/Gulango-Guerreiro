@@ -19,6 +19,7 @@ from .models import (
     MissaoDiaria,
     UsuarioMissao,
     LessonProgress,
+    Notificacao,
 )
 from avatars.models import Avatar
 
@@ -39,6 +40,17 @@ _CMP_OPS = {
     ast.Gt: operator.gt,
     ast.GtE: operator.ge,
 }
+
+
+def enviar_notificacao(usuario, titulo: str, mensagem: str, tipo: str) -> None:
+    """Cria uma :class:`~progress.models.Notificacao` para o usuário."""
+
+    Notificacao.objects.create(
+        usuario=usuario,
+        titulo=titulo,
+        mensagem=mensagem,
+        tipo=tipo,
+    )
 
 
 def _safe_eval(expr: str, variables: Dict[str, Any]) -> Any:
@@ -131,6 +143,12 @@ def verificar_conquistas(avatar: Avatar) -> None:
 
         if _avaliar_condicao(conquista.condicao, avatar):
             AvatarConquista.objects.create(avatar=avatar, conquista=conquista)
+            enviar_notificacao(
+                avatar.user,
+                "Conquista desbloqueada",
+                f"Você desbloqueou a conquista {conquista.nome}!",
+                Notificacao.TIPO_CONQUISTA,
+            )
 
 
 def verificar_missoes_automaticas(
