@@ -377,3 +377,54 @@ def iniciar_duelo(usuario1: "CustomUser", usuario2: "CustomUser") -> Duelo:
         )
 
     return duelo
+
+
+def responder_pergunta_duelo(
+    pergunta: "PerguntaDuelo", jogador: "CustomUser", resposta: str
+) -> None:
+    """Processa a resposta de ``jogador`` em uma pergunta de duelo.
+
+    A função registra a resposta, verifica se houve acerto e, caso todas as
+    perguntas do duelo já tenham sido respondidas, define o vencedor com base
+    no número de acertos. O vencedor recebe XP e moedas.
+    """
+
+    from avatars.models import Avatar
+    from .models import PerguntaDuelo, Duelo
+
+    if jogador == pergunta.duelo.jogador_1:
+        pergunta.resposta_jogador_1 = resposta
+        pergunta.acertou_1 = resposta.strip().lower() == pergunta.resposta_correta.strip().lower()
+    elif jogador == pergunta.duelo.jogador_2:
+        pergunta.resposta_jogador_2 = resposta
+        pergunta.acertou_2 = resposta.strip().lower() == pergunta.resposta_correta.strip().lower()
+    else:
+        raise ValueError("Jogador inválido para esta pergunta")
+    pergunta.save()
+
+    duelo = pergunta.duelo
+    perguntas = PerguntaDuelo.objects.filter(duelo=duelo)
+    todas_respondidas = all(
+        p.resposta_jogador_1 and p.resposta_jogador_2 for p in perguntas
+    )
+    if not todas_respondidas:
+        return
+
+    acertos_1 = perguntas.filter(acertou_1=True).count()
+    acertos_2 = perguntas.filter(acertou_2=True).count()
+
+    vencedor = None
+    if acertos_1 > acertos_2:
+        vencedor = duelo.jogador_1
+    elif acertos_2 > acertos_1:
+        vencedor = duelo.jogador_2
+
+    duelo.vencedor = vencedor
+    duelo.status = Duelo.STATUS_FINALIZADO
+    duelo.save()
+
+    if vencedor:
+        avatar = Avatar.objects.get(user=vencedor)
+        avatar.ganhar_xp(20, linguagem=_linguagem_ativa(vencedor))
+        avatar.moedas += 5
+        avatar.save()
