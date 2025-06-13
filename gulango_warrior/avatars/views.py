@@ -4,7 +4,7 @@ from django.db.models import Count
 
 from progress.models import AvatarConquista
 
-from .models import Avatar
+from .models import Avatar, SkinUsuario
 
 
 @login_required
@@ -49,4 +49,18 @@ def destaque_conquistas(request):
         "avatares": avatares,
     }
     return render(request, "avatars/conquistas_ranking.html", context)
+
+
+@login_required
+def inventario_skins(request):
+    """Lista as skins possuídas pelo usuário e indica qual está em uso."""
+
+    skins_usuario = (
+        SkinUsuario.objects.filter(usuario=request.user)
+        .select_related("skin")
+        .order_by("skin__nome")
+    )
+
+    context = {"skins_usuario": skins_usuario}
+    return render(request, "avatars/inventario_skins.html", context)
 
