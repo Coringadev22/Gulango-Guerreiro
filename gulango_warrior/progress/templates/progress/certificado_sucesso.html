@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Certificado Conquistado</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'MedievalSharp', cursive;
+            padding: 40px;
+            background: url('https://cdn.pixabay.com/photo/2017/08/30/12/45/background-2693750_1280.jpg') repeat;
+            color: #2c2c2c;
+            position: relative;
+        }
+        .scroll {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            background: url('https://cdn.pixabay.com/photo/2013/07/12/17/12/parchment-152084_960_720.png') center/cover no-repeat;
+            border: 8px solid #8b6f47;
+            border-radius: 20px;
+            text-align: center;
+        }
+        .preview {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            border: 2px solid #8b6f47;
+            display: block;
+        }
+        .seal {
+            width: 80px;
+            margin: 20px auto;
+            display: block;
+        }
+        .buttons a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background: #DAA520;
+            border: 2px solid #B8860B;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        footer img.crest {
+            width: 80px;
+            display: block;
+            margin: 40px auto 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll">
+        <img class="preview" src="https://cdn.pixabay.com/photo/2017/09/04/01/51/paper-2710235_1280.jpg" alt="Certificado Preview">
+        <img class="seal" src="https://cdn.pixabay.com/photo/2013/07/12/12/58/wax-seal-146109_1280.png" alt="Selo Dourado">
+        <p>Código de verificação: <strong>{{ certificado.codigo_validacao }}</strong></p>
+        <div class="buttons">
+            <a href="{{ certificado.arquivo_pdf.url }}">Baixar PDF</a>
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri(certificado.arquivo_pdf.url) }}" target="_blank">Compartilhar no LinkedIn</a>
+        </div>
+    </div>
+    <footer>
+        <img class="crest" src="https://cdn.pixabay.com/photo/2016/03/31/18/21/shield-1297264_1280.png" alt="Brasão">
+    </footer>
+</body>
+</html>
