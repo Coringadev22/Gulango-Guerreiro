@@ -8,7 +8,9 @@ from .models import (
 )
 
 admin.site.register(LessonProgress)
-admin.site.register(Conquista)
+@admin.register(Conquista)
+class ConquistaAdmin(admin.ModelAdmin):
+    list_display = ("nome", "condicao", "avatarconquista_count")
 admin.site.register(AvatarConquista)
 admin.site.register(MissaoDiaria)
 admin.site.register(UsuarioMissao)

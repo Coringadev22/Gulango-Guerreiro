@@ -19,6 +19,10 @@ class Conquista(models.Model):
     def __str__(self):
         return self.nome
 
+    def avatarconquista_count(self) -> int:
+        """Return how many avatars have unlocked this achievement."""
+        return self.avatarconquista_set.count()
+
 
 class AvatarConquista(models.Model):
     avatar = models.ForeignKey(
