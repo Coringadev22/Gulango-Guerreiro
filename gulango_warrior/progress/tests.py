@@ -371,3 +371,66 @@ class IniciarDueloTests(TestCase):
         perguntas = PerguntaDuelo.objects.filter(duelo=duelo)
         self.assertEqual(perguntas.count(), 5)
 
+
+class ResponderPerguntaDueloTests(TestCase):
+    def setUp(self):
+        self.user1 = CustomUser.objects.create_user(username="r1", password="p")
+        self.user2 = CustomUser.objects.create_user(username="r2", password="p")
+        Avatar.objects.create(user=self.user1)
+        Avatar.objects.create(user=self.user2)
+        instrutor = CustomUser.objects.create_user(
+            username="instr", password="p", is_instructor=True
+        )
+        self.curso = Course.objects.create(
+            title="Duel", description="d", instructor=instrutor
+        )
+        self.lesson = Lesson.objects.create(
+            course=self.curso, title="L", video_url="http://ex", order=1
+        )
+        for i in range(10):
+            Exercise.objects.create(
+                lesson=self.lesson,
+                question_text=f"Q{i}",
+                correct_answer="A",
+                answer_type="quiz",
+            )
+        ProgressoPorLinguagem.objects.create(
+            usuario=self.user1,
+            linguagem=self.curso.linguagem,
+            xp_total=50,
+            nivel=1,
+        )
+        ProgressoPorLinguagem.objects.create(
+            usuario=self.user2,
+            linguagem=self.curso.linguagem,
+            xp_total=60,
+            nivel=1,
+        )
+
+    def test_responder_e_finalizar(self):
+        from .utils import iniciar_duelo, responder_pergunta_duelo
+
+        duelo = iniciar_duelo(self.user1, self.user2)
+        perguntas = list(PerguntaDuelo.objects.filter(duelo=duelo))
+
+        # User1 acerta 3, user2 acerta 2
+        for idx, p in enumerate(perguntas):
+            if idx < 3:
+                responder_pergunta_duelo(p, self.user1, "A")
+            else:
+                responder_pergunta_duelo(p, self.user1, "B")
+            if idx in [3, 4]:
+                responder_pergunta_duelo(p, self.user2, "A")
+            else:
+                responder_pergunta_duelo(p, self.user2, "B")
+
+        duelo.refresh_from_db()
+        self.assertEqual(duelo.status, Duelo.STATUS_FINALIZADO)
+        self.assertEqual(duelo.vencedor, self.user1)
+
+        avatar1 = Avatar.objects.get(user=self.user1)
+        avatar2 = Avatar.objects.get(user=self.user2)
+        self.assertEqual(avatar1.xp_total, 20)
+        self.assertEqual(avatar1.moedas, 5)
+        self.assertEqual(avatar2.xp_total, 0)
+
