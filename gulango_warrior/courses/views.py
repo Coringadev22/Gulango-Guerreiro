@@ -16,15 +16,19 @@ def mapa_mundi(request):
             user=request.user, lesson__course=curso
         )
 
-        iniciou = progresso_qs.exists()
         concluidas = progresso_qs.filter(completed=True).count()
-        concluido = total_aulas > 0 and concluidas == total_aulas
+
+        if not progresso_qs.exists():
+            status = "não iniciado"
+        elif total_aulas > 0 and concluidas == total_aulas:
+            status = "concluído"
+        else:
+            status = "em andamento"
 
         cursos_info.append(
             {
                 "curso": curso,
-                "iniciado": iniciou,
-                "concluido": concluido,
+                "status": status,
                 "concluidas": concluidas,
                 "total": total_aulas,
             }
