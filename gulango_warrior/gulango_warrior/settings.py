@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'progress',
     'avatars',
     'marketplace',
+    'guildas',
     'dashboard',
 ]
 
