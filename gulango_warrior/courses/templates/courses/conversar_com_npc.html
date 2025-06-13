@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Conversa com NPC</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Conversa com NPC{% endblock %}
+{% block content %}
     <h1>{{ npc.nome }}</h1>
     <p>{{ frase_inicial }}</p>
 
@@ -18,5 +14,4 @@
         <textarea name="pergunta" id="pergunta" rows="4" cols="40"></textarea><br>
         <button type="submit">Enviar</button>
     </form>
-</body>
-</html>
+{% endblock %}
