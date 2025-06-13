@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
-load_dotenv()
+#load_dotenv()
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "chave-teste")
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'marketplace',
     'guildas',
     'dashboard',
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
