@@ -59,3 +59,37 @@ class Avatar(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username} - Nível {self.nivel}"
+
+
+class SkinVisual(models.Model):
+    """Representa elementos visuais personalizáveis disponíveis no jogo."""
+
+    TIPO_AVATAR = "avatar"
+    TIPO_FUNDO = "fundo_perfil"
+    TIPO_MOLDURA = "moldura"
+    TIPO_BRASAO = "brasao"
+
+    TIPO_CHOICES = [
+        (TIPO_AVATAR, "avatar"),
+        (TIPO_FUNDO, "fundo_perfil"),
+        (TIPO_MOLDURA, "moldura"),
+        (TIPO_BRASAO, "brasao"),
+    ]
+
+    CLASSE_CHOICES = [
+        ("mago", "Mago"),
+        ("guerreiro", "Guerreiro"),
+        ("arqueiro", "Arqueiro"),
+        ("todas", "Todas"),
+    ]
+
+    nome = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    imagem = models.ImageField(upload_to="skins/")
+    preco_moedas = models.IntegerField()
+    classe_restrita = models.CharField(
+        max_length=20, choices=CLASSE_CHOICES, default="todas"
+    )
+
+    def __str__(self) -> str:  # pragma: no cover - simples representacao
+        return self.nome
