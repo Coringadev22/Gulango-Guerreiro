@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ranking Geral</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(#5d473a, #3b2f2f);
+            color: #f8f5f2;
+            font-family: "Georgia", serif;
+        }
+        .ranking {
+            max-width: 420px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 5px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .ranking ul {
+            list-style: none;
+            padding: 0;
+        }
+        .ranking li {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="ranking">
+        <h1>Ranking Geral</h1>
+        <ul>
+            {% for avatar in avatares %}
+            <li>{{ forloop.counter }}. {{ avatar.user.username }} - XP {{ avatar.xp_total }}</li>
+            {% empty %}
+            <li>Nenhum avatar encontrado.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
