@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import CustomUser
+from progress.models import Notificacao
 
 
 class Avatar(models.Model):
@@ -17,15 +18,30 @@ class Avatar(models.Model):
     moedas = models.IntegerField(default=0)
 
     def ganhar_xp(self, quantidade: int) -> None:
-        """Incrementa o XP do avatar e verifica conquistas."""
+        """Incrementa o XP do avatar e dispara notificações."""
 
+        from progress.utils import verificar_conquistas, enviar_notificacao
+
+        nivel_anterior = self.nivel
         self.xp_total += quantidade
         while self.xp_total >= self.nivel * 100:
             self.nivel += 1
         self.save()
 
-        # Importação tardia para evitar dependência circular
-        from progress.utils import verificar_conquistas
+        enviar_notificacao(
+            self.user,
+            "Ganho de XP",
+            f"Você ganhou {quantidade} XP.",
+            Notificacao.TIPO_XP,
+        )
+
+        if self.nivel > nivel_anterior:
+            enviar_notificacao(
+                self.user,
+                "Subiu de nível",
+                f"Você alcançou o nível {self.nivel}!",
+                Notificacao.TIPO_NIVEL,
+            )
 
         verificar_conquistas(self)
 
