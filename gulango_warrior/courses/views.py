@@ -1,9 +1,9 @@
-from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-
-from .models import Course, Lesson, NPC, HistoricoDialogo
-from .utils import gerar_resposta_ia
+from django.shortcuts import get_object_or_404, render
 from progress.models import LessonProgress
+
+from .models import NPC, Course, HistoricoDialogo, Lesson
+from .utils import gerar_resposta_ia
 
 
 @login_required
@@ -59,10 +59,13 @@ def conversar_com_npc(request, npc_id: int):
             resposta=resposta,
         )
 
+    historico = HistoricoDialogo.objects.filter(npc=npc, usuario=request.user).order_by(
+        "data"
+    )
+
     context = {
         "npc": npc,
         "frase_inicial": npc.frase_inicial,
-        "resposta": resposta,
+        "historico": historico,
     }
-    return render(request, "courses/conversar_com_npc.html", context)
-
+    return render(request, "courses/dialogo_npc.html", context)
