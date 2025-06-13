@@ -6,6 +6,7 @@ from avatars.models import Avatar
 from django.core.files.uploadedfile import SimpleUploadedFile
 from courses.models import Course, Lesson
 from datetime import date
+from django.utils import timezone
 
 from .models import (
     Conquista,
@@ -16,6 +17,8 @@ from .models import (
     ProgressoPorLinguagem,
     Certificado,
     LessonProgress,
+    Duelo,
+    PerguntaDuelo,
 )
 from .utils import verificar_missoes_automaticas
 
@@ -301,4 +304,25 @@ class ValidarCertificadoViewTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Código Inválido")
+
+
+class PerguntaDueloModelTests(TestCase):
+    def test_create_pergunta_duelo_defaults(self):
+        user1 = CustomUser.objects.create_user(username="u1", password="p1")
+        user2 = CustomUser.objects.create_user(username="u2", password="p2")
+        duelo = Duelo.objects.create(
+            jogador_1=user1,
+            jogador_2=user2,
+            data_inicio=timezone.now(),
+            data_fim=timezone.now(),
+        )
+        pergunta = PerguntaDuelo.objects.create(
+            duelo=duelo,
+            pergunta="Qual a capital?",
+            resposta_correta="A",
+        )
+
+        self.assertFalse(pergunta.acertou_1)
+        self.assertFalse(pergunta.acertou_2)
+        self.assertEqual(str(pergunta), "Qual a capital?")
 

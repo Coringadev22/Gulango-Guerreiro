@@ -155,3 +155,18 @@ class Duelo(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover - simples representacao
         return f"{self.jogador_1} vs {self.jogador_2} - {self.status}"
+
+
+class PerguntaDuelo(models.Model):
+    """Representa uma pergunta associada a um :class:`Duelo`."""
+
+    duelo = models.ForeignKey(Duelo, on_delete=models.CASCADE)
+    pergunta = models.TextField()
+    resposta_correta = models.CharField(max_length=255)
+    resposta_jogador_1 = models.CharField(max_length=255, blank=True)
+    resposta_jogador_2 = models.CharField(max_length=255, blank=True)
+    acertou_1 = models.BooleanField(default=False)
+    acertou_2 = models.BooleanField(default=False)
+
+    def __str__(self) -> str:  # pragma: no cover - simples representacao
+        return self.pergunta
