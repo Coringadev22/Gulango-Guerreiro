@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from avatars.models import Avatar
-from .models import MissaoDiaria, UsuarioMissao
+from .models import MissaoDiaria, UsuarioMissao, Notificacao
 from .utils import _avaliar_condicao, gerar_feedback_ia
 
 
@@ -54,3 +54,21 @@ def feedback_personalizado(request):
 
     context = {"mensagem": mensagem, "avatar": avatar}
     return render(request, "progress/feedback.html", context)
+
+
+@login_required
+def notificacoes_usuario(request):
+    """Lista as notificações do usuário logado e permite marcá-las como lidas."""
+
+    if request.method == "POST":
+        notif_id = request.POST.get("notificacao_id")
+        notificacao = get_object_or_404(
+            Notificacao, pk=notif_id, usuario=request.user
+        )
+        notificacao.lida = True
+        notificacao.save()
+        return redirect("notificacoes_usuario")
+
+    notificacoes = Notificacao.objects.filter(usuario=request.user).order_by("-data")
+    context = {"notificacoes": notificacoes}
+    return render(request, "notificacoes/lista.html", context)
