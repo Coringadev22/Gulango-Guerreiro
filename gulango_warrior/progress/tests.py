@@ -121,3 +121,15 @@ class VerificarMissoesAutomaticasTests(TestCase):
         self.avatar.refresh_from_db()
         self.assertEqual(self.avatar.xp_total, 15)
         self.assertEqual(self.avatar.moedas, 2)
+
+
+class FeedbackPersonalizadoViewTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="fb", password="123")
+        Avatar.objects.create(user=self.user)
+
+    def test_feedback_view(self):
+        self.client.login(username="fb", password="123")
+        response = self.client.get(reverse("feedback_personalizado"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("mensagem", response.context)
