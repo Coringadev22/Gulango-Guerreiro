@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from avatars.models import Avatar
 from .models import MissaoDiaria, UsuarioMissao
-from .utils import _avaliar_condicao
+from .utils import _avaliar_condicao, gerar_feedback_ia
 
 
 @login_required
@@ -43,3 +43,14 @@ def missoes_do_dia(request):
 
     context = {"missoes_info": missoes_info, "mensagem": mensagem}
     return render(request, "progress/missoes.html", context)
+
+
+@login_required
+def feedback_personalizado(request):
+    """Gera e exibe um feedback personalizado para o usuário logado."""
+
+    avatar = Avatar.objects.get(user=request.user)
+    mensagem = gerar_feedback_ia(avatar)
+
+    context = {"mensagem": mensagem, "avatar": avatar}
+    return render(request, "progress/feedback.html", context)
