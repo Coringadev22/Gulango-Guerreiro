@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 
 from .models import Avatar
 from progress.models import AvatarConquista
@@ -31,4 +32,19 @@ def ranking_geral(request):
         "avatares": avatares,
     }
     return render(request, "avatars/ranking.html", context)
+
+
+@login_required
+def destaque_conquistas(request):
+    """Exibe os avatares com mais conquistas desbloqueadas."""
+
+    avatares = (
+        Avatar.objects.annotate(qtd_conquistas=Count("avatarconquista"))
+        .order_by("-qtd_conquistas")[:10]
+    )
+
+    context = {
+        "avatares": avatares,
+    }
+    return render(request, "avatars/conquistas_ranking.html", context)
 
