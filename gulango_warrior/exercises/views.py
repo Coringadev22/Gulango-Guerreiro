@@ -37,7 +37,8 @@ def code_executor(request):
 
         if exercise and output.strip() == exercise.correct_answer.strip():
             avatar = Avatar.objects.get(user=request.user)
-            avatar.ganhar_xp(exercise.xp_recompensa)
+            linguagem = exercise.lesson.course.linguagem
+            avatar.ganhar_xp(exercise.xp_recompensa, linguagem=linguagem)
             xp_message = f"Voc\u00ea ganhou {exercise.xp_recompensa} XP!"
 
             lp, _ = LessonProgress.objects.get_or_create(

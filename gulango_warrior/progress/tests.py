@@ -5,7 +5,14 @@ from accounts.models import CustomUser
 from avatars.models import Avatar
 from datetime import date
 
-from .models import Conquista, AvatarConquista, MissaoDiaria, UsuarioMissao, Notificacao
+from .models import (
+    Conquista,
+    AvatarConquista,
+    MissaoDiaria,
+    UsuarioMissao,
+    Notificacao,
+    ProgressoPorLinguagem,
+)
 from .utils import verificar_missoes_automaticas
 
 
@@ -69,7 +76,8 @@ class MissoesDoDiaViewTests(TestCase):
     def test_concluir_missao(self):
         self.client.login(username="player", password="123")
         response = self.client.post(
-            reverse("missoes_diarias"), {"missao_id": self.missao.id}
+            reverse("missoes_diarias"),
+            {"missao_id": self.missao.id, "linguagem": ProgressoPorLinguagem.LING_GOLANG},
         )
         self.assertRedirects(response, reverse("missoes_diarias"))
         self.avatar.refresh_from_db()
@@ -83,6 +91,10 @@ class MissoesDoDiaViewTests(TestCase):
                 concluida=True,
             ).exists()
         )
+        progresso = ProgressoPorLinguagem.objects.get(
+            usuario=self.user, linguagem=ProgressoPorLinguagem.LING_GOLANG
+        )
+        self.assertEqual(progresso.xp_total, 10)
 
 
 class VerificarMissoesAutomaticasTests(TestCase):
@@ -97,14 +109,18 @@ class VerificarMissoesAutomaticasTests(TestCase):
         )
 
     def test_verificar_missoes(self):
-        verificar_missoes_automaticas(self.user)
+        verificar_missoes_automaticas(
+            self.user, {"linguagem": ProgressoPorLinguagem.LING_GOLANG}
+        )
         usuario_missao = UsuarioMissao.objects.get(
             usuario=self.user, missao=self.missao, data=date.today()
         )
         self.assertFalse(usuario_missao.concluida)
 
-        self.avatar.ganhar_xp(10)
-        verificar_missoes_automaticas(self.user)
+        self.avatar.ganhar_xp(10, linguagem=ProgressoPorLinguagem.LING_GOLANG)
+        verificar_missoes_automaticas(
+            self.user, {"linguagem": ProgressoPorLinguagem.LING_GOLANG}
+        )
 
         usuario_missao = UsuarioMissao.objects.get(
             usuario=self.user, missao=self.missao, data=date.today()
@@ -113,6 +129,10 @@ class VerificarMissoesAutomaticasTests(TestCase):
         self.avatar.refresh_from_db()
         self.assertEqual(self.avatar.xp_total, 15)
         self.assertEqual(self.avatar.moedas, 2)
+        progresso = ProgressoPorLinguagem.objects.get(
+            usuario=self.user, linguagem=ProgressoPorLinguagem.LING_GOLANG
+        )
+        self.assertEqual(progresso.xp_total, 15)
 
 
 class FeedbackPersonalizadoViewTests(TestCase):
