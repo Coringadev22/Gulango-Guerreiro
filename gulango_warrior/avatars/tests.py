@@ -198,3 +198,40 @@ class InventarioSkinsViewTests(TestCase):
         self.assertEqual(len(skins), 2)
         self.assertTrue(any(su.em_uso for su in skins))
 
+
+class LojaSkinsViewTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="shop", password="123")
+        self.avatar = Avatar.objects.create(user=self.user, classe="mago", moedas=20)
+        self.skin1 = SkinVisual.objects.create(
+            nome="Roupagem A",
+            tipo=SkinVisual.TIPO_AVATAR,
+            imagem="skins/a.png",
+            preco_moedas=10,
+            classe_restrita="mago",
+        )
+        self.skin2 = SkinVisual.objects.create(
+            nome="Roupagem B",
+            tipo=SkinVisual.TIPO_AVATAR,
+            imagem="skins/b.png",
+            preco_moedas=30,
+            classe_restrita="guerreiro",
+        )
+        SkinUsuario.objects.create(usuario=self.user, skin=self.skin1)
+
+    def test_loja_skins_view_info(self):
+        self.client.login(username="shop", password="123")
+        response = self.client.get(reverse("loja_skins"))
+        self.assertEqual(response.status_code, 200)
+        infos = list(response.context["skins_info"])
+        self.assertEqual(len(infos), 2)
+
+        info1 = next(i for i in infos if i["skin"] == self.skin1)
+        self.assertTrue(info1["ja_possui"])
+        self.assertFalse(info1["pode_comprar"])
+
+        info2 = next(i for i in infos if i["skin"] == self.skin2)
+        self.assertFalse(info2["ja_possui"])
+        self.assertFalse(info2["pode_comprar"])
+
+

@@ -4,7 +4,7 @@ from django.db.models import Count
 
 from progress.models import AvatarConquista
 
-from .models import Avatar, SkinUsuario
+from .models import Avatar, SkinUsuario, SkinVisual
 
 
 @login_required
@@ -63,4 +63,27 @@ def inventario_skins(request):
 
     context = {"skins_usuario": skins_usuario}
     return render(request, "avatars/inventario_skins.html", context)
+
+
+@login_required
+def loja_skins(request):
+    """Lista todas as skins disponíveis, indicando posse e possibilidade de compra."""
+
+    avatar = Avatar.objects.get(user=request.user)
+    skins = SkinVisual.objects.all().order_by("nome")
+
+    skins_info = []
+    for skin in skins:
+        ja_possui = SkinUsuario.objects.filter(usuario=request.user, skin=skin).exists()
+        classe_ok = skin.classe_restrita == "todas" or skin.classe_restrita == avatar.classe
+        moedas_ok = avatar.moedas >= skin.preco_moedas
+        pode_comprar = classe_ok and moedas_ok and not ja_possui
+        skins_info.append({
+            "skin": skin,
+            "ja_possui": ja_possui,
+            "pode_comprar": pode_comprar,
+        })
+
+    context = {"skins_info": skins_info, "avatar": avatar}
+    return render(request, "avatars/loja_skins.html", context)
 

@@ -4,6 +4,7 @@ from .views import (
     ranking_geral,
     destaque_conquistas,
     inventario_skins,
+    loja_skins,
 )
 
 urlpatterns = [
@@ -11,4 +12,5 @@ urlpatterns = [
     path('ranking/', ranking_geral, name='ranking_geral'),
     path('conquistas/', destaque_conquistas, name='destaque_conquistas'),
     path('inventario/', inventario_skins, name='inventario_skins'),
+    path('loja/', loja_skins, name='loja_skins'),
 ]
