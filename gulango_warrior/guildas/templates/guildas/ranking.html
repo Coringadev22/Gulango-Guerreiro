@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ranking das Guildas</title>
+    <style>
+        body {
+            font-family: 'MedievalSharp', cursive;
+            margin: 0;
+            padding: 40px;
+            background: url('https://cdn.pixabay.com/photo/2017/08/30/12/45/background-2693750_1280.jpg') repeat;
+            color: #2c2c2c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.85);
+            border: 5px solid #8b6f47;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #8b6f47;
+            text-align: left;
+        }
+        th {
+            background: #d4af37;
+        }
+        tr:first-child td {
+            background: rgba(255, 215, 0, 0.3);
+            font-weight: bold;
+        }
+        img.brasao {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 2px solid #8b6f47;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ranking das Guildas</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Brasão</th>
+                <th>Guilda</th>
+                <th>Membros</th>
+                <th>XP Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in guildas %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><img class="brasao" src="{{ g.brasao.url }}" alt="Brasão"></td>
+                <td>{{ g.nome }}</td>
+                <td>{{ g.num_membros }}</td>
+                <td>{{ g.xp_total }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">Nenhuma guilda encontrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
