@@ -137,3 +137,35 @@ class NotificacaoModelTests(TestCase):
             tipo="sistema",
         )
         self.assertEqual(str(notificacao), "Boas vindas")
+
+
+class NotificacoesUsuarioViewTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="nu", password="123")
+        self.notificacao = Notificacao.objects.create(
+            usuario=self.user,
+            titulo="Sauda\u00e7\u00e3o",
+            mensagem="Oi",
+            tipo="sistema",
+        )
+
+    def test_login_required(self):
+        response = self.client.get(reverse("notificacoes_usuario"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response["Location"])
+
+    def test_listar_e_marcar(self):
+        self.client.login(username="nu", password="123")
+        # GET list
+        response = self.client.get(reverse("notificacoes_usuario"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Sauda\u00e7\u00e3o")
+
+        # Mark as read
+        response = self.client.post(
+            reverse("notificacoes_usuario"), {"notificacao_id": self.notificacao.id}
+        )
+        self.assertRedirects(response, reverse("notificacoes_usuario"))
+        self.notificacao.refresh_from_db()
+        self.assertTrue(self.notificacao.lida)
+
