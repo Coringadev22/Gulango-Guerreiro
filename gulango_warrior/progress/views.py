@@ -10,6 +10,7 @@ from .models import (
     Notificacao,
     AvatarConquista,
     ProgressoPorLinguagem,
+    LessonProgress,
 )
 from .utils import _avaliar_condicao, gerar_feedback_ia
 
@@ -110,3 +111,37 @@ def painel_linguagens(request):
 
     context = {"linguagens": linguagens_info}
     return render(request, "progress/painel_linguagens.html", context)
+
+@login_required
+def emitir_certificado(request, curso_id: int):
+    """Emite um certificado caso o curso esteja concluído."""
+    from courses.models import Course, Lesson
+    from .models import Certificado
+    from .utils import gerar_certificado_pdf
+
+    curso = get_object_or_404(Course, pk=curso_id)
+    total = Lesson.objects.filter(course=curso).count()
+    concluidas = LessonProgress.objects.filter(
+        user=request.user, lesson__course=curso, completed=True
+    ).count()
+
+    if total == 0 or concluidas < total:
+        return redirect('mapa_mundi')
+
+    certificado = Certificado.objects.filter(usuario=request.user, curso=curso).first()
+    if not certificado:
+        certificado = gerar_certificado_pdf(request.user, curso)
+
+    return redirect('ver_certificado', certificado_id=certificado.id)
+
+
+@login_required
+def ver_certificado(request, certificado_id: int):
+    """Exibe uma página com link para download do certificado."""
+    from .models import Certificado
+
+    certificado = get_object_or_404(
+        Certificado, pk=certificado_id, usuario=request.user
+    )
+    context = {'certificado': certificado}
+    return render(request, 'progress/ver_certificado.html', context)

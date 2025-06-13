@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Certificado</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'MedievalSharp', cursive;
+            padding: 40px;
+            background: url('https://cdn.pixabay.com/photo/2017/08/30/12/45/background-2693750_1280.jpg') repeat;
+            color: #2c2c2c;
+        }
+        .scroll {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 8px solid #8b6f47;
+            border-radius: 20px;
+            text-align: center;
+        }
+        .download {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #DAA520;
+            border: 2px solid #B8860B;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll">
+        <h1>Certificado emitido!</h1>
+        <p>Clique abaixo para baixar o PDF do seu certificado.</p>
+        <a class="download" href="{{ certificado.arquivo_pdf.url }}">Baixar Certificado</a>
+    </div>
+</body>
+</html>

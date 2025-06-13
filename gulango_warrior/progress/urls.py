@@ -4,6 +4,8 @@ from .views import (
     feedback_personalizado,
     notificacoes_usuario,
     painel_linguagens,
+    emitir_certificado,
+    ver_certificado,
 )
 
 urlpatterns = [
@@ -12,4 +14,14 @@ urlpatterns = [
     path("notificacoes/", notificacoes_usuario, name="notificacoes_usuario"),
     path("linguagens/", painel_linguagens, name="painel_linguagens"),
     path("painel/", painel_linguagens, name="painel_linguagens"),
+    path(
+        "certificado/<int:curso_id>/emitir/",
+        emitir_certificado,
+        name="emitir_certificado",
+    ),
+    path(
+        "certificado/<int:certificado_id>/",
+        ver_certificado,
+        name="ver_certificado",
+    ),
 ]
