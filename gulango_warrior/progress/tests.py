@@ -5,7 +5,7 @@ from accounts.models import CustomUser
 from avatars.models import Avatar
 from datetime import date
 
-from .models import Conquista, AvatarConquista, MissaoDiaria, UsuarioMissao
+from .models import Conquista, AvatarConquista, MissaoDiaria, UsuarioMissao, Notificacao
 from .utils import verificar_missoes_automaticas
 
 
@@ -24,9 +24,7 @@ class GanharXPConquistaTests(TestCase):
         avatar.ganhar_xp(100)
 
         self.assertTrue(
-            AvatarConquista.objects.filter(
-                avatar=avatar, conquista=conquista
-            ).exists()
+            AvatarConquista.objects.filter(avatar=avatar, conquista=conquista).exists()
         )
         self.assertEqual(avatar.xp_total, 100)
         self.assertEqual(avatar.nivel, 2)
@@ -48,16 +46,12 @@ class UsuarioMissaoModelTests(TestCase):
             data=date.today(),
         )
 
-        self.assertTrue(
-            UsuarioMissao.objects.filter(id=usuario_missao.id).exists()
-        )
+        self.assertTrue(UsuarioMissao.objects.filter(id=usuario_missao.id).exists())
 
 
 class MissoesDoDiaViewTests(TestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            username="player", password="123"
-        )
+        self.user = CustomUser.objects.create_user(username="player", password="123")
         self.avatar = Avatar.objects.create(user=self.user)
         self.missao = MissaoDiaria.objects.create(
             descricao="Ganhar XP",
@@ -93,9 +87,7 @@ class MissoesDoDiaViewTests(TestCase):
 
 class VerificarMissoesAutomaticasTests(TestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            username="auto", password="123"
-        )
+        self.user = CustomUser.objects.create_user(username="auto", password="123")
         self.avatar = Avatar.objects.create(user=self.user)
         self.missao = MissaoDiaria.objects.create(
             descricao="Ganhar 10 XP",
@@ -133,3 +125,15 @@ class FeedbackPersonalizadoViewTests(TestCase):
         response = self.client.get(reverse("feedback_personalizado"))
         self.assertEqual(response.status_code, 200)
         self.assertIn("mensagem", response.context)
+
+
+class NotificacaoModelTests(TestCase):
+    def test_str(self):
+        user = CustomUser.objects.create_user(username="n", password="p")
+        notificacao = Notificacao.objects.create(
+            usuario=user,
+            titulo="Boas vindas",
+            mensagem="Bem-vindo ao jogo",
+            tipo="sistema",
+        )
+        self.assertEqual(str(notificacao), "Boas vindas")
