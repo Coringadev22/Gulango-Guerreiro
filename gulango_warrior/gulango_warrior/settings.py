@@ -12,6 +12,23 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "chave-teste")
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+
+_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "")
+ALLOWED_HOSTS = [h for h in _hosts.split(",") if h] if _hosts else []
+
+# Apenas para depuração
+print("DEBUG:", DEBUG)
+print("SECRET_KEY:", SECRET_KEY)
+print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +38,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+
 
 _hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "")
 ALLOWED_HOSTS = [h for h in _hosts.split(",") if h] if _hosts else []
