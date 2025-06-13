@@ -30,7 +30,12 @@ class AvatarViewSecurityTests(TestCase):
         Avatar.objects.create(user=self.user)
 
     def test_views_require_login(self):
-        for name in ["perfil_avatar", "ranking_geral", "destaque_conquistas"]:
+        for name in [
+            "perfil_avatar",
+            "ranking_geral",
+            "destaque_conquistas",
+            "inventario_skins",
+        ]:
             url = reverse(name)
             response = self.client.get(url)
             self.assertEqual(response.status_code, 302)
@@ -114,3 +119,34 @@ class ComprarSkinTests(TestCase):
         self.assertFalse(
             SkinUsuario.objects.filter(usuario=self.user, skin=self.skin1).exists()
         )
+
+
+class InventarioSkinsViewTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="vis", password="123")
+        self.avatar = Avatar.objects.create(user=self.user)
+        self.skin1 = SkinVisual.objects.create(
+            nome="Skin A",
+            tipo=SkinVisual.TIPO_AVATAR,
+            imagem="skins/a.png",
+            preco_moedas=0,
+            classe_restrita="todas",
+        )
+        self.skin2 = SkinVisual.objects.create(
+            nome="Skin B",
+            tipo=SkinVisual.TIPO_AVATAR,
+            imagem="skins/b.png",
+            preco_moedas=0,
+            classe_restrita="todas",
+        )
+        SkinUsuario.objects.create(usuario=self.user, skin=self.skin1, em_uso=True)
+        SkinUsuario.objects.create(usuario=self.user, skin=self.skin2, em_uso=False)
+
+    def test_inventario_skins_view(self):
+        self.client.login(username="vis", password="123")
+        response = self.client.get(reverse("inventario_skins"))
+        self.assertEqual(response.status_code, 200)
+        skins = list(response.context["skins_usuario"])
+        self.assertEqual(len(skins), 2)
+        self.assertTrue(any(su.em_uso for su in skins))
+
