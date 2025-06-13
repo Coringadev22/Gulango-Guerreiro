@@ -93,3 +93,14 @@ class SkinVisual(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover - simples representacao
         return self.nome
+
+
+class SkinUsuario(models.Model):
+    """Relaciona um :class:`CustomUser` a uma :class:`SkinVisual`."""
+
+    usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    skin = models.ForeignKey(SkinVisual, on_delete=models.CASCADE)
+    em_uso = models.BooleanField(default=False)
+
+    def __str__(self) -> str:  # pragma: no cover - simples representacao
+        return f"{self.usuario.username} - {self.skin.nome}"

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import CustomUser
-from .models import Avatar, SkinVisual
+from .models import Avatar, SkinVisual, SkinUsuario
 
 
 class AvatarModelTests(TestCase):
@@ -47,3 +47,19 @@ class SkinVisualModelTests(TestCase):
             classe_restrita="todas",
         )
         self.assertEqual(str(skin), "Capa Azul")
+
+
+class SkinUsuarioModelTests(TestCase):
+    def test_create_skin_usuario(self):
+        user = CustomUser.objects.create_user(username="u", password="p")
+        skin = SkinVisual.objects.create(
+            nome="Robe Vermelho",
+            tipo="avatar",
+            imagem="skins/robe.png",
+            preco_moedas=10,
+            classe_restrita="todas",
+        )
+        skin_usuario = SkinUsuario.objects.create(usuario=user, skin=skin)
+
+        self.assertTrue(SkinUsuario.objects.filter(id=skin_usuario.id).exists())
+        self.assertEqual(str(skin_usuario), "u - Robe Vermelho")
