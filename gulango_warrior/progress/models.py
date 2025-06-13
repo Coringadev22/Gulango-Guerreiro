@@ -114,3 +114,44 @@ class Certificado(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover - simples representacao
         return f"{self.usuario} - {self.curso}"
+
+
+class Duelo(models.Model):
+    """Representa um duelo entre dois jogadores."""
+
+    STATUS_PENDENTE = "pendente"
+    STATUS_EM_ANDAMENTO = "em_andamento"
+    STATUS_FINALIZADO = "finalizado"
+
+    STATUS_CHOICES = [
+        (STATUS_PENDENTE, "pendente"),
+        (STATUS_EM_ANDAMENTO, "em_andamento"),
+        (STATUS_FINALIZADO, "finalizado"),
+    ]
+
+    jogador_1 = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="duelos_iniciados",
+    )
+    jogador_2 = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="duelos_recebidos",
+    )
+    vencedor = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="duelos_vencidos",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDENTE,
+    )
+    data_inicio = models.DateTimeField()
+    data_fim = models.DateTimeField()
+
+    def __str__(self) -> str:  # pragma: no cover - simples representacao
+        return f"{self.jogador_1} vs {self.jogador_2} - {self.status}"
