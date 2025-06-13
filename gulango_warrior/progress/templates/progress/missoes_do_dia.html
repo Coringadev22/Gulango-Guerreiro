@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Missões do Dia</title>
+</head>
+<body>
+    <h1>Missões do Dia</h1>
+    {% if mensagem %}
+        <p>{{ mensagem }}</p>
+    {% endif %}
+    <ul>
+        {% for info in missoes_info %}
+        <li>
+            {{ info.missao.descricao }} - XP {{ info.missao.xp_recompensa }} / Moedas {{ info.missao.moedas_recompensa }}
+            {% if info.concluida %}
+                (concluída)
+            {% elif info.condicao_ok %}
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="missao_id" value="{{ info.missao.id }}">
+                    <button type="submit">Concluir</button>
+                </form>
+            {% else %}
+                (não disponível)
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
