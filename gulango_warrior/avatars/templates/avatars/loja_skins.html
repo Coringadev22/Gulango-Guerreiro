@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Loja de Skins</title>
+</head>
+<body>
+    <h1>Loja de Skins</h1>
+    <p>Moedas: {{ avatar.moedas }}</p>
+    <ul>
+        {% for info in skins_info %}
+        <li>
+            <h2>{{ info.skin.nome }}</h2>
+            <img src="{{ info.skin.imagem.url }}" alt="{{ info.skin.nome }}">
+            <p>Preço: {{ info.skin.preco_moedas }}</p>
+            <p>Classe permitida: {{ info.skin.classe_restrita }}</p>
+            {% if info.ja_possui %}
+                <p>Você já possui esta skin.</p>
+            {% elif info.pode_comprar %}
+                <p>Você pode comprar esta skin.</p>
+            {% else %}
+                <p>Você não pode comprar esta skin.</p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
