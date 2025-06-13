@@ -2,39 +2,65 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Feedback</title>
+    <title>Feedback do Sábio</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'MedievalSharp', cursive;
+            margin: 0;
             padding: 40px;
             background: url('https://cdn.pixabay.com/photo/2017/08/30/12/45/background-2693750_1280.jpg') repeat;
             color: #2c2c2c;
+            position: relative;
         }
-        .board {
-            max-width: 600px;
+        .scroll {
+            max-width: 700px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.9);
-            border: 5px solid #8b6f47;
-            border-radius: 10px;
-            padding: 20px;
+            padding: 60px 40px;
+            background: url('https://cdn.pixabay.com/photo/2013/07/12/17/12/parchment-152084_960_720.png') center/cover no-repeat;
+            border: 8px solid #8b6f47;
+            border-radius: 20px;
             text-align: center;
+            animation: unroll 1s ease-out forwards;
+            transform-origin: top;
         }
-        .avatar-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #8b6f47;
-            margin-bottom: 20px;
+        @keyframes unroll {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+        .crest {
+            width: 80px;
+            position: absolute;
+            top: 0;
+        }
+        .crest.left { left: 10px; }
+        .crest.right { right: 10px; transform: scaleX(-1); }
+        .wizard {
+            width: 120px;
+            margin: 20px auto;
+            display: block;
+        }
+        .new-analysis {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #DAA520;
+            border: 2px solid #B8860B;
+            color: #000;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="board">
-        <img src="{{ avatar.imagem.url }}" alt="Avatar" class="avatar-img">
+    <img class="crest left" src="https://cdn.pixabay.com/photo/2016/03/31/18/21/shield-1297264_1280.png" alt="Brasão">
+    <img class="crest right" src="https://cdn.pixabay.com/photo/2016/03/31/18/21/shield-1297264_1280.png" alt="Brasão">
+    <div class="scroll">
+        <img class="wizard" src="https://cdn.pixabay.com/photo/2014/11/10/16/37/wizard-526328_960_720.png" alt="Sábio Mago">
         <p>{{ mensagem }}</p>
+        <form method="get">
+            <button type="submit" class="new-analysis">Nova Análise</button>
+        </form>
     </div>
 </body>
 </html>
