@@ -28,7 +28,7 @@ def missoes_do_dia(request):
             usuario_missao.concluida = True
             usuario_missao.save()
             request.session["mensagem_missoes"] = "Missão concluída!"
-        return redirect("missoes_do_dia")
+        return redirect("missoes_diarias")
 
     missoes_info = []
     for missao in MissaoDiaria.objects.all():
