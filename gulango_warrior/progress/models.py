@@ -1,4 +1,5 @@
 from django.db import models
+from .validators import validate_condicao
 
 # Create your models here.
 class LessonProgress(models.Model):
@@ -13,7 +14,7 @@ class Conquista(models.Model):
     nome = models.CharField(max_length=100)
     descricao = models.TextField()
     icone = models.ImageField(upload_to='conquistas/')
-    condicao = models.CharField(max_length=100)
+    condicao = models.CharField(max_length=100, validators=[validate_condicao])
 
     def __str__(self):
         return self.nome
@@ -38,7 +39,7 @@ class MissaoDiaria(models.Model):
     descricao = models.CharField(max_length=255)
     xp_recompensa = models.IntegerField()
     moedas_recompensa = models.IntegerField()
-    condicao = models.CharField(max_length=100)
+    condicao = models.CharField(max_length=100, validators=[validate_condicao])
 
     def __str__(self) -> str:  # pragma: no cover - simples representacao
         return self.descricao
