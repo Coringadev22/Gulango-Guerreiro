@@ -24,4 +24,5 @@ urlpatterns = [
     path('marketplace/', include('marketplace.urls')),
     path('courses/', include('courses.urls')),
     path('progress/', include('progress.urls')),
+    path('dashboard/', include('dashboard.urls')),
 ]
