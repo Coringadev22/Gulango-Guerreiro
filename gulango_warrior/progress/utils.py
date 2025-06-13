@@ -146,7 +146,7 @@ def verificar_conquistas(avatar: Avatar) -> None:
             enviar_notificacao(
                 avatar.user,
                 "Conquista desbloqueada",
-                f"Você desbloqueou a conquista {conquista.nome}!",
+                f"Nova conquista desbloqueada: {conquista.nome}!",
                 Notificacao.TIPO_CONQUISTA,
             )
 
@@ -171,6 +171,33 @@ def verificar_missoes_automaticas(
             avatar.save()
             usuario_missao.concluida = True
             usuario_missao.save()
+
+
+def verificar_curso_concluido(usuario, curso) -> None:
+    """Envia uma notificação caso o usuário tenha finalizado todas as aulas do curso."""
+
+    from courses.models import Lesson
+
+    total = Lesson.objects.filter(course=curso).count()
+    if total == 0:
+        return
+
+    concluido = LessonProgress.objects.filter(
+        user=usuario, lesson__course=curso, completed=True
+    ).count()
+    if concluido == total:
+        ja_notificado = Notificacao.objects.filter(
+            usuario=usuario,
+            titulo="Curso concluído",
+            mensagem__icontains=curso.title,
+        ).exists()
+        if not ja_notificado:
+            enviar_notificacao(
+                usuario,
+                "Curso concluído",
+                "Curso concluído! Você dominou as terras de Golandor!",
+                Notificacao.TIPO_SISTEMA,
+            )
 
 
 def gerar_feedback_ia(avatar: Avatar) -> str:

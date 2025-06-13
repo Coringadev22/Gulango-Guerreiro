@@ -5,7 +5,10 @@ from django.contrib.auth.decorators import login_required
 import io
 import sys
 
+from django.utils import timezone
 from avatars.models import Avatar
+from progress.models import LessonProgress
+from progress.utils import verificar_curso_concluido
 from .models import Exercise
 
 @csrf_exempt
@@ -36,6 +39,16 @@ def code_executor(request):
             avatar = Avatar.objects.get(user=request.user)
             avatar.ganhar_xp(exercise.xp_recompensa)
             xp_message = f"Voc\u00ea ganhou {exercise.xp_recompensa} XP!"
+
+            lp, _ = LessonProgress.objects.get_or_create(
+                user=request.user, lesson=exercise.lesson
+            )
+            if not lp.completed:
+                lp.completed = True
+                lp.completed_at = timezone.now()
+                lp.save()
+
+            verificar_curso_concluido(request.user, exercise.lesson.course)
 
     context = {
         "output": output,
