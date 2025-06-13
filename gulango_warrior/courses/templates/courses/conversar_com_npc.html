@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Conversa com NPC</title>
+</head>
+<body>
+    <h1>{{ npc.nome }}</h1>
+    <p>{{ frase_inicial }}</p>
+
+    {% if resposta %}
+        <p><strong>Resposta:</strong> {{ resposta }}</p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="pergunta">Pergunta:</label><br>
+        <textarea name="pergunta" id="pergunta" rows="4" cols="40"></textarea><br>
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>
