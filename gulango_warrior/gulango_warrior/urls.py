@@ -26,6 +26,7 @@ urlpatterns = [
     path('avatars/', include('avatars.urls')),
     path('marketplace/', include('marketplace.urls')),
     path('courses/', include('courses.urls')),
+    path('notificacoes/', include('notificacoes.urls')),
     path('progress/', include('progress.urls')),
     path('dashboard/', include('dashboard.urls')),
 ]
