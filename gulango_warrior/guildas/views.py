@@ -1,7 +1,8 @@
 
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, Count
+from django.db.models.functions import Coalesce
 
 from .models import Guilda, MembroGuilda
 from avatars.models import Avatar
@@ -69,4 +70,25 @@ def criar_guilda(request):
         return redirect("criar_guilda")
 
     return render(request, "guildas/criar_guilda.html", {"mensagem": mensagem})
+
+
+@login_required
+def ranking_guildas(request):
+    """Exibe o ranking das guildas pelo XP total de seus membros."""
+
+    guildas = (
+        Guilda.objects.annotate(
+            num_membros=Count("membroguilda", distinct=True),
+            xp_total=Coalesce(
+                Sum("membroguilda__usuario__avatar__xp_total"),
+                0,
+            ),
+        )
+        .order_by("-xp_total")
+    )
+
+    context = {
+        "guildas": guildas,
+    }
+    return render(request, "guildas/ranking.html", context)
 
