@@ -2,39 +2,72 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Ranking Geral</title>
+    <title>Hall da Fama</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     <style>
         body {
+            font-family: 'MedievalSharp', cursive;
             margin: 0;
             padding: 40px;
-            background: linear-gradient(#5d473a, #3b2f2f);
-            color: #f8f5f2;
-            font-family: "Georgia", serif;
+            background: url('https://cdn.pixabay.com/photo/2017/08/30/12/45/background-2693750_1280.jpg') repeat;
+            color: #2c2c2c;
         }
         .ranking {
-            max-width: 420px;
+            max-width: 600px;
             margin: 0 auto;
-            background-color: rgba(0, 0, 0, 0.6);
-            border: 5px solid #d4af37;
+            background: rgba(255, 255, 255, 0.85);
+            border: 5px solid #8b6f47;
             border-radius: 10px;
             padding: 20px;
+        }
+        .ranking h1 {
+            text-align: center;
+            margin-bottom: 20px;
         }
         .ranking ul {
             list-style: none;
             padding: 0;
         }
         .ranking li {
+            display: flex;
+            align-items: center;
+            background: rgba(240, 230, 214, 0.9);
+            border: 2px solid #8b6f47;
+            padding: 10px;
             margin-bottom: 10px;
-            font-size: 1.2em;
+        }
+        .ranking li:first-child {
+            border: 3px solid #d4af37;
+            box-shadow: 0 0 10px #d4af37;
+            background: rgba(255, 215, 0, 0.3);
+        }
+        .ranking li img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #8b6f47;
+            margin-right: 15px;
+        }
+        .rank-info {
+            flex: 1;
         }
     </style>
 </head>
 <body>
     <div class="ranking">
-        <h1>Ranking Geral</h1>
+        <h1>Hall da Fama</h1>
         <ul>
             {% for avatar in avatares %}
-            <li>{{ forloop.counter }}. {{ avatar.user.username }} - XP {{ avatar.xp_total }}</li>
+            <li>
+                <span>{{ forloop.counter }}º</span>
+                <img src="{{ avatar.imagem.url }}" alt="Avatar de {{ avatar.user.username }}">
+                <div class="rank-info">
+                    <strong>{{ avatar.user.username }}</strong><br>
+                    Classe: {{ avatar.classe }} | Nível: {{ avatar.nivel }} | XP: {{ avatar.xp_total }}
+                </div>
+            </li>
             {% empty %}
             <li>Nenhum avatar encontrado.</li>
             {% endfor %}
