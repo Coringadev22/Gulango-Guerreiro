@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import Dict, Any, Optional
 import ast
 import operator
 import os
+import hashlib
+from io import BytesIO
 
+from django.conf import settings
+from django.core.files.base import ContentFile
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
 try:
     import openai
 except Exception:  # openai not installed
@@ -271,3 +278,55 @@ def gerar_feedback_ia(avatar: Avatar) -> str:
         return resposta.choices[0].message.content.strip()
     except Exception:
         return "O oráculo silenciou-se por ora. Volte mais tarde."
+
+
+def gerar_certificado_pdf(usuario, curso):
+    """Gera um certificado em PDF e o registra no banco.
+
+    O PDF inclui nome do aluno, curso, data, assinatura e brasão, sendo
+    salvo em ``certificados/`` dentro do ``MEDIA_ROOT``. Um código único de
+    validação é gerado automaticamente e associado ao certificado.
+    """
+
+    from .models import Certificado
+
+    timestamp = datetime.utcnow().isoformat()
+    base = f"{usuario.id}-{curso.id}-{timestamp}"
+    codigo = hashlib.sha256(base.encode()).hexdigest()[:12]
+
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    c.setTitle("Certificado")
+
+    brasao_path = os.path.join(settings.BASE_DIR, "brasao.png")
+    if os.path.exists(brasao_path):
+        c.drawImage(brasao_path, width - 5 * cm, height - 5 * cm, width=4 * cm, preserveAspectRatio=True, mask="auto")
+
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(width / 2, height - 5 * cm, "Certificado de Conclusão")
+
+    nome_aluno = usuario.get_full_name() or usuario.username
+    c.setFont("Helvetica", 14)
+    c.drawCentredString(width / 2, height - 7 * cm, f"Concedemos a {nome_aluno}")
+    c.drawCentredString(width / 2, height - 8 * cm, f"por concluir o curso {curso.title}")
+
+    data_emissao = datetime.now().strftime("%d/%m/%Y")
+    c.drawCentredString(width / 2, height - 9 * cm, f"Data de emissão: {data_emissao}")
+
+    assinatura_path = os.path.join(settings.BASE_DIR, "assinatura.png")
+    if os.path.exists(assinatura_path):
+        c.drawImage(assinatura_path, width / 2 - 3 * cm, 3 * cm, width=6 * cm, preserveAspectRatio=True, mask="auto")
+
+    c.showPage()
+    c.save()
+
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    certificado = Certificado.objects.create(
+        usuario=usuario, curso=curso, codigo_validacao=codigo
+    )
+    certificado.arquivo_pdf.save(f"{codigo}.pdf", ContentFile(pdf_content))
+    return certificado
