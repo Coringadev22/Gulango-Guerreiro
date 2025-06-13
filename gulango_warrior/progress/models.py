@@ -42,3 +42,15 @@ class MissaoDiaria(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover - simples representacao
         return self.descricao
+
+
+class UsuarioMissao(models.Model):
+    """Relaciona um usuário com uma missão diária em uma data específica."""
+
+    usuario = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
+    missao = models.ForeignKey(MissaoDiaria, on_delete=models.CASCADE)
+    concluida = models.BooleanField(default=False)
+    data = models.DateField()
+
+    def __str__(self) -> str:  # pragma: no cover - simples representacao
+        return f"{self.usuario} - {self.missao} ({self.data})"

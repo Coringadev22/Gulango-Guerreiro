@@ -2,7 +2,9 @@ from django.test import TestCase
 
 from accounts.models import CustomUser
 from avatars.models import Avatar
-from .models import Conquista, AvatarConquista
+from datetime import date
+
+from .models import Conquista, AvatarConquista, MissaoDiaria, UsuarioMissao
 
 
 class GanharXPConquistaTests(TestCase):
@@ -24,3 +26,19 @@ class GanharXPConquistaTests(TestCase):
         )
         self.assertEqual(avatar.xp_total, 100)
         self.assertEqual(avatar.nivel, 2)
+
+
+class UsuarioMissaoModelTests(TestCase):
+    def test_criacao_usuario_missao(self):
+        user = CustomUser.objects.create_user(username="teste", password="123")
+        missao = MissaoDiaria.objects.create(
+            descricao="Testar", xp_recompensa=10, moedas_recompensa=5, condicao=""
+        )
+        usuario_missao = UsuarioMissao.objects.create(
+            usuario=user,
+            missao=missao,
+            concluida=True,
+            data=date.today(),
+        )
+
+        self.assertTrue(UsuarioMissao.objects.filter(id=usuario_missao.id).exists())
