@@ -79,6 +79,17 @@
             margin: 0;
             font-size: 0.9em;
         }
+
+        .mestre-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background: #DAA520;
+            border: 2px solid #B8860B;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -107,5 +118,7 @@
             {% endfor %}
         </ul>
     </div>
+
+    <a href="{% url 'feedback_personalizado' %}" class="mestre-btn">Receber Conselho do Mestre</a>
 </body>
 </html>
