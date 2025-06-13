@@ -1,3 +1,5 @@
 Django>=5.2
 Pillow
 openai
+reportlab
+python-dotenv
