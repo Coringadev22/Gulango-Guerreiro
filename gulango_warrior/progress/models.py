@@ -101,3 +101,16 @@ class ProgressoPorLinguagem(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover - simples representacao
         return f"{self.usuario} - {self.linguagem}"
+
+
+class Certificado(models.Model):
+    """Representa um certificado gerado apos a conclusao de um curso."""
+
+    usuario = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE)
+    curso = models.ForeignKey("courses.Course", on_delete=models.CASCADE)
+    codigo_validacao = models.CharField(max_length=100, unique=True)
+    data_emissao = models.DateTimeField(auto_now_add=True)
+    arquivo_pdf = models.FileField(upload_to="certificados/")
+
+    def __str__(self) -> str:  # pragma: no cover - simples representacao
+        return f"{self.usuario} - {self.curso}"

@@ -3,6 +3,8 @@ from django.urls import reverse
 
 from accounts.models import CustomUser
 from avatars.models import Avatar
+from django.core.files.uploadedfile import SimpleUploadedFile
+from courses.models import Course
 from datetime import date
 
 from .models import (
@@ -12,6 +14,7 @@ from .models import (
     UsuarioMissao,
     Notificacao,
     ProgressoPorLinguagem,
+    Certificado,
 )
 from .utils import verificar_missoes_automaticas
 
@@ -213,4 +216,23 @@ class PainelLinguagensViewTests(TestCase):
         self.client.login(username="pl", password="123")
         response = self.client.get(reverse("painel_linguagens"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "golang")
+        self.assertContains(response, "Golang")
+
+
+class CertificadoModelTests(TestCase):
+    def test_criar_certificado(self):
+        usuario = CustomUser.objects.create_user(username="cert", password="123")
+        instrutor = CustomUser.objects.create_user(username="inst", password="123", is_instructor=True)
+        curso = Course.objects.create(
+            title="Curso",
+            description="Desc",
+            instructor=instrutor,
+        )
+        pdf = SimpleUploadedFile("certificado.pdf", b"arquivo")
+        cert = Certificado.objects.create(
+            usuario=usuario,
+            curso=curso,
+            codigo_validacao="ABC123",
+            arquivo_pdf=pdf,
+        )
+        self.assertTrue(Certificado.objects.filter(id=cert.id).exists())
