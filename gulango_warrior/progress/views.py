@@ -4,7 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from avatars.models import Avatar
-from .models import MissaoDiaria, UsuarioMissao, Notificacao
+from .models import (
+    MissaoDiaria,
+    UsuarioMissao,
+    Notificacao,
+    AvatarConquista,
+    ProgressoPorLinguagem,
+)
 from .utils import _avaliar_condicao, gerar_feedback_ia
 
 
@@ -63,9 +69,7 @@ def notificacoes_usuario(request):
 
     if request.method == "POST":
         notif_id = request.POST.get("notificacao_id")
-        notificacao = get_object_or_404(
-            Notificacao, pk=notif_id, usuario=request.user
-        )
+        notificacao = get_object_or_404(Notificacao, pk=notif_id, usuario=request.user)
         notificacao.lida = True
         notificacao.save()
         return redirect("notificacoes_usuario")
@@ -73,3 +77,36 @@ def notificacoes_usuario(request):
     notificacoes = Notificacao.objects.filter(usuario=request.user).order_by("-data")
     context = {"notificacoes": notificacoes}
     return render(request, "notificacoes/lista.html", context)
+
+
+@login_required
+def painel_linguagens(request):
+    """Exibe o progresso do usuário em cada linguagem."""
+    avatar = Avatar.objects.get(user=request.user)
+    conquistas = AvatarConquista.objects.filter(avatar=avatar).select_related(
+        "conquista"
+    )
+
+    linguagens_info = []
+    for codigo, nome in ProgressoPorLinguagem.LINGUAGEM_CHOICES:
+        progresso = ProgressoPorLinguagem.objects.filter(
+            usuario=request.user, linguagem=codigo
+        ).first()
+        xp_total = progresso.xp_total if progresso else 0
+        nivel = progresso.nivel if progresso else 1
+        xp_atual = xp_total - (nivel - 1) * 100
+        xp_proximo = nivel * 100
+        conquistas_lang = conquistas.filter(conquista__nome__icontains=nome)
+        linguagens_info.append(
+            {
+                "codigo": codigo,
+                "nome": nome,
+                "nivel": nivel,
+                "xp_atual": xp_atual,
+                "xp_proximo": xp_proximo,
+                "conquistas": conquistas_lang,
+            }
+        )
+
+    context = {"linguagens": linguagens_info}
+    return render(request, "progress/painel_linguagens.html", context)

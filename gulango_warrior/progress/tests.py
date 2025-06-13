@@ -77,7 +77,10 @@ class MissoesDoDiaViewTests(TestCase):
         self.client.login(username="player", password="123")
         response = self.client.post(
             reverse("missoes_diarias"),
-            {"missao_id": self.missao.id, "linguagem": ProgressoPorLinguagem.LING_GOLANG},
+            {
+                "missao_id": self.missao.id,
+                "linguagem": ProgressoPorLinguagem.LING_GOLANG,
+            },
         )
         self.assertRedirects(response, reverse("missoes_diarias"))
         self.avatar.refresh_from_db()
@@ -189,3 +192,25 @@ class NotificacoesUsuarioViewTests(TestCase):
         self.notificacao.refresh_from_db()
         self.assertTrue(self.notificacao.lida)
 
+
+class PainelLinguagensViewTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="pl", password="123")
+        Avatar.objects.create(user=self.user)
+        ProgressoPorLinguagem.objects.create(
+            usuario=self.user,
+            linguagem=ProgressoPorLinguagem.LING_GOLANG,
+            xp_total=50,
+            nivel=1,
+        )
+
+    def test_login_required(self):
+        response = self.client.get(reverse("painel_linguagens"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response["Location"])
+
+    def test_painel_renderiza(self):
+        self.client.login(username="pl", password="123")
+        response = self.client.get(reverse("painel_linguagens"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "golang")
