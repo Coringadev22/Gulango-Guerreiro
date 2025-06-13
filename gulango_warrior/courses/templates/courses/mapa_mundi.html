@@ -10,13 +10,7 @@
         {% for info in cursos %}
         <li>
             {{ info.curso.title }} -
-            {% if info.concluido %}
-                Concluído
-            {% elif info.iniciado %}
-                Em progresso ({{ info.concluidas }}/{{ info.total }})
-            {% else %}
-                Não iniciado
-            {% endif %}
+            {{ info.status }}{% if info.status == 'em andamento' %} ({{ info.concluidas }}/{{ info.total }}){% endif %}
         </li>
         {% endfor %}
     </ul>
