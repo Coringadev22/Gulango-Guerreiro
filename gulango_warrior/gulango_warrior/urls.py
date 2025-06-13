@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from dashboard.views import admin_dashboard
+from progress.views import validar_certificado
 
 
 urlpatterns = [
@@ -29,4 +30,5 @@ urlpatterns = [
     path('notificacoes/', include('notificacoes.urls')),
     path('progress/', include('progress.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('validar/<str:codigo_validacao>/', validar_certificado, name='validar_certificado'),
 ]

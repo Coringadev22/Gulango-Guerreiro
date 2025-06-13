@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mural de Certidão</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'MedievalSharp', cursive;
+            padding: 40px;
+            background: url('https://cdn.pixabay.com/photo/2014/07/10/11/25/paper-389415_1280.jpg') repeat;
+            color: #2c2c2c;
+        }
+        .mural {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 8px solid #8b6f47;
+            border-radius: 20px;
+            text-align: center;
+        }
+        footer img.crest {
+            width: 80px;
+            display: block;
+            margin: 40px auto 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="mural">
+        {% if certificado %}
+            <h1>Certificado Válido</h1>
+            <p>Aluno: <strong>{{ certificado.usuario.get_full_name|default:certificado.usuario.username }}</strong></p>
+            <p>Curso: <strong>{{ certificado.curso.title }}</strong></p>
+            <p>Data de emissão: <strong>{{ certificado.data_emissao|date:"d/m/Y" }}</strong></p>
+        {% else %}
+            <h1>Código Inválido</h1>
+            <p>Este código não corresponde a nenhum pergaminho registrado.</p>
+        {% endif %}
+    </div>
+    <footer>
+        <img class="crest" src="https://cdn.pixabay.com/photo/2016/03/31/18/21/shield-1297264_1280.png" alt="Brasão">
+    </footer>
+</body>
+</html>

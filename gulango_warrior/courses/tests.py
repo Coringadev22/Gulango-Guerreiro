@@ -66,7 +66,7 @@ class CourseViewsTests(TestCase):
             tipo=NPC.IA,
         )
 
-        with patch("courses.utils.gerar_resposta_ia", return_value="resposta"):
+        with patch("courses.views.gerar_resposta_ia", return_value="resposta"):
             self.client.login(username="p", password="1")
             response = self.client.post(
                 reverse("conversar_npc", args=[npc.id]), {"pergunta": "?"}

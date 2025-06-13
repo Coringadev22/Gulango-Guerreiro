@@ -270,3 +270,35 @@ class EmitirCertificadoViewTests(TestCase):
         self.assertIsNotNone(cert)
         self.assertRedirects(response, reverse("ver_certificado", args=[cert.id]))
 
+
+class ValidarCertificadoViewTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="val", password="123")
+        Avatar.objects.create(user=self.user)
+        self.instrutor = CustomUser.objects.create_user(
+            username="instv", password="123", is_instructor=True
+        )
+        self.curso = Course.objects.create(
+            title="Curso Val", description="Desc", instructor=self.instrutor
+        )
+        pdf = SimpleUploadedFile("cert.pdf", b"arquivo")
+        self.cert = Certificado.objects.create(
+            usuario=self.user,
+            curso=self.curso,
+            codigo_validacao="VAL123",
+            arquivo_pdf=pdf,
+        )
+
+    def test_certificado_valido(self):
+        url = reverse("validar_certificado", args=[self.cert.codigo_validacao])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Certificado Válido")
+        self.assertContains(response, self.curso.title)
+
+    def test_certificado_invalido(self):
+        url = reverse("validar_certificado", args=["XXXX"])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Código Inválido")
+
