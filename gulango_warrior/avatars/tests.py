@@ -64,6 +64,7 @@ class SkinUsuarioModelTests(TestCase):
         self.assertTrue(SkinUsuario.objects.filter(id=skin_usuario.id).exists())
         self.assertEqual(str(skin_usuario), "u - Robe Vermelho")
 
+
 class TrocarSkinTests(TestCase):
     def setUp(self):
         self.user = CustomUser.objects.create_user(username="skin", password="123")
@@ -110,3 +111,54 @@ class TrocarSkinTests(TestCase):
             SkinUsuario.objects.get(usuario=self.user, skin=self.skin1).em_uso
         )
 
+
+
+class ComprarSkinTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="buyer", password="123")
+        self.avatar = Avatar.objects.create(user=self.user, moedas=20)
+        self.skin1 = SkinVisual.objects.create(
+            nome="Armadura A",
+            tipo=SkinVisual.TIPO_AVATAR,
+            imagem="skins/a.png",
+            preco_moedas=10,
+            classe_restrita="todas",
+        )
+        self.skin2 = SkinVisual.objects.create(
+            nome="Armadura B",
+            tipo=SkinVisual.TIPO_AVATAR,
+            imagem="skins/b.png",
+            preco_moedas=5,
+            classe_restrita="todas",
+        )
+
+    def test_compra_primeira_skin_em_uso(self):
+        from .utils import comprar_skin
+
+        resultado = comprar_skin(self.user, self.skin1)
+        self.assertTrue(resultado)
+        self.avatar.refresh_from_db()
+        self.assertEqual(self.avatar.moedas, 10)
+        skin_usuario = SkinUsuario.objects.get(usuario=self.user, skin=self.skin1)
+        self.assertTrue(skin_usuario.em_uso)
+
+    def test_compra_segunda_skin_nao_em_uso(self):
+        from .utils import comprar_skin
+
+        comprar_skin(self.user, self.skin1)
+        self.avatar.refresh_from_db()
+        resultado = comprar_skin(self.user, self.skin2)
+        self.assertTrue(resultado)
+        skin_usuario = SkinUsuario.objects.get(usuario=self.user, skin=self.skin2)
+        self.assertFalse(skin_usuario.em_uso)
+
+    def test_compra_sem_moedas(self):
+        from .utils import comprar_skin
+
+        self.avatar.moedas = 5
+        self.avatar.save()
+        resultado = comprar_skin(self.user, self.skin1)
+        self.assertFalse(resultado)
+        self.assertFalse(
+            SkinUsuario.objects.filter(usuario=self.user, skin=self.skin1).exists()
+        )
