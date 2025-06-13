@@ -42,4 +42,4 @@ def missoes_do_dia(request):
         )
 
     context = {"missoes_info": missoes_info, "mensagem": mensagem}
-    return render(request, "progress/missoes_do_dia.html", context)
+    return render(request, "progress/missoes.html", context)
