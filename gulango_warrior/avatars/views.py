@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 
-from .models import Avatar
 from progress.models import AvatarConquista
+
+from .models import Avatar
 
 
 @login_required
@@ -40,7 +41,8 @@ def destaque_conquistas(request):
 
     avatares = (
         Avatar.objects.annotate(qtd_conquistas=Count("avatarconquista"))
-        .order_by("-qtd_conquistas")[:10]
+        .prefetch_related("avatarconquista_set__conquista")
+        .order_by("-qtd_conquistas")[:5]
     )
 
     context = {

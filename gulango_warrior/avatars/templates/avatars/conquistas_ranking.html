@@ -14,12 +14,13 @@
             color: #2c2c2c;
         }
         .ranking {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.85) url('https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f4dc.svg') no-repeat center 20px;
+            background-size: 80px;
             border: 5px solid #8b6f47;
             border-radius: 10px;
-            padding: 20px;
+            padding: 60px 20px 20px;
         }
         .ranking h1 {
             text-align: center;
@@ -42,7 +43,7 @@
             box-shadow: 0 0 10px #d4af37;
             background: rgba(255, 215, 0, 0.3);
         }
-        .ranking li img {
+        .ranking li img.avatar {
             width: 60px;
             height: 60px;
             object-fit: cover;
@@ -53,6 +54,28 @@
         .rank-info {
             flex: 1;
         }
+        .icons img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid #8b6f47;
+            margin-right: 5px;
+        }
+        .pos {
+            font-size: 1.2em;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .pos::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: url('https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f6e1.svg') no-repeat center/contain;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -61,11 +84,16 @@
         <ul>
             {% for avatar in avatares %}
             <li>
-                <span>{{ forloop.counter }}º</span>
-                <img src="{{ avatar.imagem.url }}" alt="Avatar de {{ avatar.user.username }}">
+                <span class="pos">{{ forloop.counter }}º</span>
+                <img class="avatar" src="{{ avatar.imagem.url }}" alt="Avatar de {{ avatar.user.username }}">
                 <div class="rank-info">
                     <strong>{{ avatar.user.username }}</strong><br>
-                    Conquistas: {{ avatar.qtd_conquistas }}
+                    <img class="trophy" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3c6.svg" alt="Troféu" width="20"> {{ avatar.qtd_conquistas }} conquistas
+                    <div class="icons">
+                        {% for av_conquista in avatar.avatarconquista_set.all %}
+                        <img src="{{ av_conquista.conquista.icone.url }}" alt="{{ av_conquista.conquista.nome }}">
+                        {% endfor %}
+                    </div>
                 </div>
             </li>
             {% empty %}
