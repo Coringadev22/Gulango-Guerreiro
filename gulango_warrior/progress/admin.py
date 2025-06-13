@@ -10,6 +10,7 @@ from .models import (
     MissaoDiaria,
     UsuarioMissao,
     ProgressoPorLinguagem,
+    Certificado,
 )
 
 admin.site.register(LessonProgress)
@@ -66,3 +67,4 @@ class MissaoDiariaAdmin(admin.ModelAdmin):
 
 admin.site.register(UsuarioMissao)
 admin.site.register(ProgressoPorLinguagem)
+admin.site.register(Certificado)
