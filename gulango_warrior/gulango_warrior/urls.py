@@ -22,4 +22,5 @@ urlpatterns = [
     path('exercises/', include('exercises.urls')),
     path('avatars/', include('avatars.urls')),
     path('marketplace/', include('marketplace.urls')),
+    path('courses/', include('courses.urls')),
 ]
