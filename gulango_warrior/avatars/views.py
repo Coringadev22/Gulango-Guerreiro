@@ -20,3 +20,15 @@ def perfil_avatar(request):
     }
     return render(request, "avatars/perfil.html", context)
 
+
+@login_required
+def ranking_geral(request):
+    """Exibe o ranking geral dos avatares."""
+
+    avatares = Avatar.objects.all().order_by("-xp_total")[:10]
+
+    context = {
+        "avatares": avatares,
+    }
+    return render(request, "avatars/ranking.html", context)
+
