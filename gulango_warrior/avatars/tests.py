@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import CustomUser
-from .models import Avatar
+from .models import Avatar, SkinVisual
 
 
 class AvatarModelTests(TestCase):
@@ -35,3 +35,15 @@ class AvatarViewSecurityTests(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 302)
             self.assertIn("/accounts/login/", response["Location"])
+
+
+class SkinVisualModelTests(TestCase):
+    def test_str(self):
+        skin = SkinVisual.objects.create(
+            nome="Capa Azul",
+            tipo="avatar",
+            imagem="skins/capa.png",
+            preco_moedas=5,
+            classe_restrita="todas",
+        )
+        self.assertEqual(str(skin), "Capa Azul")
