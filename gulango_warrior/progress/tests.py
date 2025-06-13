@@ -6,6 +6,7 @@ from avatars.models import Avatar
 from datetime import date
 
 from .models import Conquista, AvatarConquista, MissaoDiaria, UsuarioMissao
+from .utils import verificar_missoes_automaticas
 
 
 class GanharXPConquistaTests(TestCase):
@@ -23,7 +24,9 @@ class GanharXPConquistaTests(TestCase):
         avatar.ganhar_xp(100)
 
         self.assertTrue(
-            AvatarConquista.objects.filter(avatar=avatar, conquista=conquista).exists()
+            AvatarConquista.objects.filter(
+                avatar=avatar, conquista=conquista
+            ).exists()
         )
         self.assertEqual(avatar.xp_total, 100)
         self.assertEqual(avatar.nivel, 2)
@@ -33,7 +36,10 @@ class UsuarioMissaoModelTests(TestCase):
     def test_criacao_usuario_missao(self):
         user = CustomUser.objects.create_user(username="teste", password="123")
         missao = MissaoDiaria.objects.create(
-            descricao="Testar", xp_recompensa=10, moedas_recompensa=5, condicao=""
+            descricao="Testar",
+            xp_recompensa=10,
+            moedas_recompensa=5,
+            condicao="",
         )
         usuario_missao = UsuarioMissao.objects.create(
             usuario=user,
@@ -42,15 +48,22 @@ class UsuarioMissaoModelTests(TestCase):
             data=date.today(),
         )
 
-        self.assertTrue(UsuarioMissao.objects.filter(id=usuario_missao.id).exists())
+        self.assertTrue(
+            UsuarioMissao.objects.filter(id=usuario_missao.id).exists()
+        )
 
 
 class MissoesDoDiaViewTests(TestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(username="player", password="123")
+        self.user = CustomUser.objects.create_user(
+            username="player", password="123"
+        )
         self.avatar = Avatar.objects.create(user=self.user)
         self.missao = MissaoDiaria.objects.create(
-            descricao="Ganhar XP", xp_recompensa=10, moedas_recompensa=5, condicao=""
+            descricao="Ganhar XP",
+            xp_recompensa=10,
+            moedas_recompensa=5,
+            condicao="",
         )
 
     def test_missoes_get(self):
@@ -61,14 +74,50 @@ class MissoesDoDiaViewTests(TestCase):
 
     def test_concluir_missao(self):
         self.client.login(username="player", password="123")
-        response = self.client.post(reverse("missoes_do_dia"), {"missao_id": self.missao.id})
+        response = self.client.post(
+            reverse("missoes_do_dia"), {"missao_id": self.missao.id}
+        )
         self.assertRedirects(response, reverse("missoes_do_dia"))
         self.avatar.refresh_from_db()
         self.assertEqual(self.avatar.xp_total, 10)
         self.assertEqual(self.avatar.moedas, 5)
         self.assertTrue(
             UsuarioMissao.objects.filter(
-                usuario=self.user, missao=self.missao, data=date.today(), concluida=True
+                usuario=self.user,
+                missao=self.missao,
+                data=date.today(),
+                concluida=True,
             ).exists()
         )
 
+
+class VerificarMissoesAutomaticasTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(
+            username="auto", password="123"
+        )
+        self.avatar = Avatar.objects.create(user=self.user)
+        self.missao = MissaoDiaria.objects.create(
+            descricao="Ganhar 10 XP",
+            xp_recompensa=5,
+            moedas_recompensa=2,
+            condicao="xp_total >= 10",
+        )
+
+    def test_verificar_missoes(self):
+        verificar_missoes_automaticas(self.user)
+        usuario_missao = UsuarioMissao.objects.get(
+            usuario=self.user, missao=self.missao, data=date.today()
+        )
+        self.assertFalse(usuario_missao.concluida)
+
+        self.avatar.ganhar_xp(10)
+        verificar_missoes_automaticas(self.user)
+
+        usuario_missao = UsuarioMissao.objects.get(
+            usuario=self.user, missao=self.missao, data=date.today()
+        )
+        self.assertTrue(usuario_missao.concluida)
+        self.avatar.refresh_from_db()
+        self.assertEqual(self.avatar.xp_total, 15)
+        self.assertEqual(self.avatar.moedas, 2)

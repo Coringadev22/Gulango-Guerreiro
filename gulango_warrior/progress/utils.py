@@ -2,21 +2,32 @@
 
 from __future__ import annotations
 
-from typing import Dict, Any
+from datetime import date
+from typing import Dict, Any, Optional
 
-from .models import Conquista, AvatarConquista
+from .models import (
+    Conquista,
+    AvatarConquista,
+    MissaoDiaria,
+    UsuarioMissao,
+)
 from avatars.models import Avatar
 
 
-def _avaliar_condicao(condicao: str, avatar: Avatar) -> bool:
+def _avaliar_condicao(
+    condicao: str,
+    avatar: Avatar,
+    contexto_extra: Optional[Dict[str, Any]] = None,
+) -> bool:
     """Avalia uma condição de desbloqueio simples.
 
     A condição deve ser uma expressão Python básica que pode usar os
     seguintes nomes de variável: ``nivel``, ``xp``, ``xp_total`` e ``moedas``.
-    Exemplo: ``"nivel >= 5"`` ou ``"xp_total >= 100"``.
+    Valores adicionais podem ser passados via ``contexto_extra``.  Exemplo:
+    ``"nivel >= 5"`` ou ``"xp_total >= 100"``.
     """
     if not condicao:
-        return False
+        return True
 
     contexto: Dict[str, Any] = {
         "nivel": avatar.nivel,
@@ -24,6 +35,8 @@ def _avaliar_condicao(condicao: str, avatar: Avatar) -> bool:
         "xp_total": avatar.xp_total,
         "moedas": avatar.moedas,
     }
+    if contexto_extra:
+        contexto.update(contexto_extra)
     try:
         return bool(eval(condicao, {}, contexto))
     except Exception:
@@ -48,3 +61,25 @@ def verificar_conquistas(avatar: Avatar) -> None:
 
         if _avaliar_condicao(conquista.condicao, avatar):
             AvatarConquista.objects.create(avatar=avatar, conquista=conquista)
+
+
+def verificar_missoes_automaticas(
+    usuario, contexto_extra: Optional[Dict[str, Any]] = None
+) -> None:
+    """Avalia e conclui automaticamente missões diárias para o usuário."""
+
+    avatar = Avatar.objects.get(user=usuario)
+    hoje = date.today()
+    for missao in MissaoDiaria.objects.all():
+        usuario_missao, _ = UsuarioMissao.objects.get_or_create(
+            usuario=usuario, missao=missao, data=hoje
+        )
+        if usuario_missao.concluida:
+            continue
+
+        if _avaliar_condicao(missao.condicao, avatar, contexto_extra):
+            avatar.ganhar_xp(missao.xp_recompensa)
+            avatar.moedas += missao.moedas_recompensa
+            avatar.save()
+            usuario_missao.concluida = True
+            usuario_missao.save()
