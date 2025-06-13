@@ -145,3 +145,17 @@ def ver_certificado(request, certificado_id: int):
     )
     context = {'certificado': certificado}
     return render(request, 'progress/ver_certificado.html', context)
+
+
+def validar_certificado(request, codigo_validacao: str):
+    """Exibe dados de um certificado a partir de seu código de validação."""
+    from .models import Certificado
+
+    certificado = (
+        Certificado.objects.select_related("usuario", "curso")
+        .filter(codigo_validacao=codigo_validacao)
+        .first()
+    )
+    context = {"certificado": certificado}
+    return render(request, "progress/validar_certificado.html", context)
+
