@@ -30,3 +30,15 @@ class AvatarConquista(models.Model):
 
     def __str__(self) -> str:
         return f"{self.avatar} - {self.conquista}"
+
+
+class MissaoDiaria(models.Model):
+    """Representa uma missão diária que os usuários podem cumprir."""
+
+    descricao = models.CharField(max_length=255)
+    xp_recompensa = models.IntegerField()
+    moedas_recompensa = models.IntegerField()
+    condicao = models.CharField(max_length=100)
+
+    def __str__(self) -> str:  # pragma: no cover - simples representacao
+        return self.descricao
