@@ -48,3 +48,14 @@ class NPC(models.Model):
 
     def __str__(self) -> str:
         return self.nome
+
+
+class HistoricoDialogo(models.Model):
+    npc = models.ForeignKey(NPC, on_delete=models.CASCADE)
+    usuario = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
+    pergunta = models.TextField()
+    resposta = models.TextField()
+    data = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.usuario.username} - {self.npc.nome}"

@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Course, Lesson, NPC
+from .models import Course, Lesson, NPC, HistoricoDialogo
 
 admin.site.register(Course)
 admin.site.register(Lesson)
 admin.site.register(NPC)
+admin.site.register(HistoricoDialogo)
