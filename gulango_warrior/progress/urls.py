@@ -15,12 +15,12 @@ urlpatterns = [
     path("linguagens/", painel_linguagens, name="painel_linguagens"),
     path("painel/", painel_linguagens, name="painel_linguagens"),
     path(
-        "certificado/<int:curso_id>/emitir/",
+        "certificado/<int:curso_id>/",
         emitir_certificado,
         name="emitir_certificado",
     ),
     path(
-        "certificado/<int:certificado_id>/",
+        "certificado/ver/<int:certificado_id>/",
         ver_certificado,
         name="ver_certificado",
     ),
