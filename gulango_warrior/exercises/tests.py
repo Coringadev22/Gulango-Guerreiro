@@ -12,7 +12,10 @@ class CodeExecutorTests(TestCase):
         self.user = CustomUser.objects.create_user(username="dev", password="pw")
         Avatar.objects.create(user=self.user)
         course = Course.objects.create(
-            title="Curso", description="d", instructor=self.user
+            title="Curso",
+            description="d",
+            instructor=self.user,
+            linguagem=Course.LING_GOLANG,
         )
         lesson = Lesson.objects.create(
             course=course, title="L1", video_url="http://ex", order=1

@@ -10,7 +10,10 @@ class CourseViewsTests(TestCase):
     def setUp(self):
         self.user = CustomUser.objects.create_user(username="p", password="1")
         self.course = Course.objects.create(
-            title="Magia", description="A", instructor=self.user
+            title="Magia",
+            description="A",
+            instructor=self.user,
+            linguagem=Course.LING_GOLANG,
         )
         self.lesson = Lesson.objects.create(
             course=self.course,
