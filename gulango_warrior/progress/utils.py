@@ -12,6 +12,8 @@ from io import BytesIO
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.utils import timezone
+from django.db.models import QuerySet
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
@@ -330,3 +332,48 @@ def gerar_certificado_pdf(usuario, curso):
     )
     certificado.arquivo_pdf.save(f"{codigo}.pdf", ContentFile(pdf_content))
     return certificado
+
+
+def _linguagem_ativa(usuario: "CustomUser") -> str:
+    """Retorna a linguagem do curso em que o usuário possui mais XP."""
+
+    progresso = (
+        ProgressoPorLinguagem.objects.filter(usuario=usuario)
+        .order_by("-xp_total")
+        .first()
+    )
+    if progresso:
+        return progresso.linguagem
+    from courses.models import Course
+
+    return Course.LING_GOLANG
+
+
+def iniciar_duelo(usuario1: "CustomUser", usuario2: "CustomUser") -> Duelo:
+    """Cria um :class:`Duelo` em andamento com 5 perguntas aleatórias."""
+
+    from exercises.models import Exercise
+    from .models import Duelo, PerguntaDuelo
+
+    linguagem = _linguagem_ativa(usuario1)
+    duelo = Duelo.objects.create(
+        jogador_1=usuario1,
+        jogador_2=usuario2,
+        status=Duelo.STATUS_EM_ANDAMENTO,
+        data_inicio=timezone.now(),
+        data_fim=timezone.now(),
+    )
+
+    perguntas: QuerySet[Exercise] = (
+        Exercise.objects.filter(lesson__course__linguagem=linguagem)
+        .order_by("?")[:5]
+    )
+
+    for ex in perguntas:
+        PerguntaDuelo.objects.create(
+            duelo=duelo,
+            pergunta=ex.question_text,
+            resposta_correta=ex.correct_answer,
+        )
+
+    return duelo

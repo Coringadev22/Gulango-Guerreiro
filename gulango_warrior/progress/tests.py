@@ -5,6 +5,7 @@ from accounts.models import CustomUser
 from avatars.models import Avatar
 from django.core.files.uploadedfile import SimpleUploadedFile
 from courses.models import Course, Lesson
+from exercises.models import Exercise
 from datetime import date
 from django.utils import timezone
 
@@ -325,4 +326,48 @@ class PerguntaDueloModelTests(TestCase):
         self.assertFalse(pergunta.acertou_1)
         self.assertFalse(pergunta.acertou_2)
         self.assertEqual(str(pergunta), "Qual a capital?")
+
+
+class IniciarDueloTests(TestCase):
+    def setUp(self):
+        self.user1 = CustomUser.objects.create_user(username="d1", password="p")
+        self.user2 = CustomUser.objects.create_user(username="d2", password="p")
+        Avatar.objects.create(user=self.user1)
+        Avatar.objects.create(user=self.user2)
+        instrutor = CustomUser.objects.create_user(
+            username="instd", password="p", is_instructor=True
+        )
+        self.curso = Course.objects.create(
+            title="Duel", description="d", instructor=instrutor
+        )
+        self.lesson = Lesson.objects.create(
+            course=self.curso, title="L", video_url="http://ex", order=1
+        )
+        for i in range(10):
+            Exercise.objects.create(
+                lesson=self.lesson,
+                question_text=f"Q{i}",
+                correct_answer="A",
+                answer_type="quiz",
+            )
+        ProgressoPorLinguagem.objects.create(
+            usuario=self.user1,
+            linguagem=self.curso.linguagem,
+            xp_total=50,
+            nivel=1,
+        )
+        ProgressoPorLinguagem.objects.create(
+            usuario=self.user2,
+            linguagem=self.curso.linguagem,
+            xp_total=60,
+            nivel=1,
+        )
+
+    def test_iniciar_duelo(self):
+        from .utils import iniciar_duelo
+
+        duelo = iniciar_duelo(self.user1, self.user2)
+        self.assertEqual(duelo.status, Duelo.STATUS_EM_ANDAMENTO)
+        perguntas = PerguntaDuelo.objects.filter(duelo=duelo)
+        self.assertEqual(perguntas.count(), 5)
 
