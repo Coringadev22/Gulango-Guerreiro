@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from datetime import date
 from typing import Dict, Any, Optional
+import ast
+import operator
 import os
 
 try:
@@ -19,6 +21,67 @@ from .models import (
     LessonProgress,
 )
 from avatars.models import Avatar
+
+
+_BIN_OPS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.Mod: operator.mod,
+}
+
+_CMP_OPS = {
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+}
+
+
+def _safe_eval(expr: str, variables: Dict[str, Any]) -> Any:
+    """Avalia uma expressão usando apenas operações seguras."""
+
+    def _eval(node: ast.AST) -> Any:
+        if isinstance(node, ast.Expression):
+            return _eval(node.body)
+        if isinstance(node, ast.Constant):
+            if isinstance(node.value, (int, float, bool)):
+                return node.value
+            raise ValueError("Valor literal não permitido")
+        if isinstance(node, ast.Name):
+            if node.id in variables:
+                return variables[node.id]
+            raise ValueError(f"Variável não permitida: {node.id}")
+        if isinstance(node, ast.BinOp) and type(node.op) in _BIN_OPS:
+            return _BIN_OPS[type(node.op)](_eval(node.left), _eval(node.right))
+        if isinstance(node, ast.BoolOp):
+            values = [_eval(v) for v in node.values]
+            if isinstance(node.op, ast.And):
+                return all(values)
+            if isinstance(node.op, ast.Or):
+                return any(values)
+        if isinstance(node, ast.UnaryOp):
+            if isinstance(node.op, ast.Not):
+                return not _eval(node.operand)
+            if isinstance(node.op, ast.USub):
+                return -_eval(node.operand)
+        if isinstance(node, ast.Compare):
+            left = _eval(node.left)
+            for op, comparator in zip(node.ops, node.comparators):
+                if type(op) not in _CMP_OPS:
+                    raise ValueError("Operação de comparação não permitida")
+                right = _eval(comparator)
+                if not _CMP_OPS[type(op)](left, right):
+                    return False
+                left = right
+            return True
+        raise ValueError("Expressão não suportada")
+
+    tree = ast.parse(expr, mode="eval")
+    return _eval(tree)
 
 
 def _avaliar_condicao(
@@ -45,7 +108,7 @@ def _avaliar_condicao(
     if contexto_extra:
         contexto.update(contexto_extra)
     try:
-        return bool(eval(condicao, {}, contexto))
+        return bool(_safe_eval(condicao, contexto))
     except Exception:
         # Se a condição não puder ser avaliada, consideramos que não foi atendida
         return False
