@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Missões</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'MedievalSharp', cursive;
+            margin: 0;
+            padding: 40px;
+            background: url('https://cdn.pixabay.com/photo/2017/08/30/12/45/background-2693750_1280.jpg') repeat;
+            color: #2c2c2c;
+        }
+        .board {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            border: 5px solid #8b6f47;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .board h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .mission-list {
+            list-style: none;
+            padding: 0;
+        }
+        .mission {
+            background: url('https://cdn.pixabay.com/photo/2016/10/10/16/11/paper-1738910_1280.jpg') center/cover;
+            border: 2px solid #8b6f47;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .mission.completed {
+            opacity: 0.6;
+        }
+        .mission.completed::after {
+            content: '\2714';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #4caf50;
+        }
+        .reward-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px 8px 34px;
+            background: #DAA520 url('https://cdn.pixabay.com/photo/2014/04/03/11/55/chest-310126_1280.png') no-repeat 8px center / 24px 24px;
+            color: #000;
+            border: 2px solid #B8860B;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="board">
+        <h1>Missões Disponíveis</h1>
+        {% if mensagem %}
+            <p>{{ mensagem }}</p>
+        {% endif %}
+        <ul class="mission-list">
+            {% for info in missoes_info %}
+            <li class="mission{% if info.concluida %} completed{% endif %}">
+                <strong>{{ info.missao.descricao }}</strong><br>
+                XP: {{ info.missao.xp_recompensa }} |
+                Moedas: {{ info.missao.moedas_recompensa }}<br>
+                {% if info.concluida %}
+                    Missão concluída!
+                {% elif info.condicao_ok %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="missao_id" value="{{ info.missao.id }}">
+                        <button type="submit" class="reward-button">Reivindicar Recompensa</button>
+                    </form>
+                {% else %}
+                    <em>Não disponível</em>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
