@@ -4,7 +4,7 @@ from django.urls import reverse
 from accounts.models import CustomUser
 from avatars.models import Avatar
 from django.core.files.uploadedfile import SimpleUploadedFile
-from courses.models import Course
+from courses.models import Course, Lesson
 from datetime import date
 
 from .models import (
@@ -15,6 +15,7 @@ from .models import (
     Notificacao,
     ProgressoPorLinguagem,
     Certificado,
+    LessonProgress,
 )
 from .utils import verificar_missoes_automaticas
 
@@ -236,3 +237,36 @@ class CertificadoModelTests(TestCase):
             arquivo_pdf=pdf,
         )
         self.assertTrue(Certificado.objects.filter(id=cert.id).exists())
+
+class EmitirCertificadoViewTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="ec", password="123")
+        Avatar.objects.create(user=self.user)
+        self.instrutor = CustomUser.objects.create_user(
+            username="inst", password="123", is_instructor=True
+        )
+        self.curso = Course.objects.create(
+            title="Curso", description="Desc", instructor=self.instrutor
+        )
+        self.lesson1 = Lesson.objects.create(
+            course=self.curso, title="L1", video_url="http://example.com", order=1
+        )
+        self.lesson2 = Lesson.objects.create(
+            course=self.curso, title="L2", video_url="http://example.com", order=2
+        )
+
+    def test_nao_concluido_redireciona(self):
+        self.client.login(username="ec", password="123")
+        response = self.client.get(reverse("emitir_certificado", args=[self.curso.id]))
+        self.assertRedirects(response, reverse("mapa_mundi"))
+        self.assertFalse(Certificado.objects.exists())
+
+    def test_emite_certificado(self):
+        self.client.login(username="ec", password="123")
+        LessonProgress.objects.create(user=self.user, lesson=self.lesson1, completed=True)
+        LessonProgress.objects.create(user=self.user, lesson=self.lesson2, completed=True)
+        response = self.client.get(reverse("emitir_certificado", args=[self.curso.id]))
+        cert = Certificado.objects.filter(usuario=self.user, curso=self.curso).first()
+        self.assertIsNotNone(cert)
+        self.assertRedirects(response, reverse("ver_certificado", args=[cert.id]))
+
