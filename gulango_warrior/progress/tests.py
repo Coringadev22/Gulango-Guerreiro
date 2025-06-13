@@ -68,16 +68,16 @@ class MissoesDoDiaViewTests(TestCase):
 
     def test_missoes_get(self):
         self.client.login(username="player", password="123")
-        response = self.client.get(reverse("missoes_do_dia"))
+        response = self.client.get(reverse("missoes_diarias"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.missao.descricao)
 
     def test_concluir_missao(self):
         self.client.login(username="player", password="123")
         response = self.client.post(
-            reverse("missoes_do_dia"), {"missao_id": self.missao.id}
+            reverse("missoes_diarias"), {"missao_id": self.missao.id}
         )
-        self.assertRedirects(response, reverse("missoes_do_dia"))
+        self.assertRedirects(response, reverse("missoes_diarias"))
         self.avatar.refresh_from_db()
         self.assertEqual(self.avatar.xp_total, 10)
         self.assertEqual(self.avatar.moedas, 5)
