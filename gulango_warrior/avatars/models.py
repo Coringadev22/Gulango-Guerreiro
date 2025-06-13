@@ -31,7 +31,7 @@ class Avatar(models.Model):
         enviar_notificacao(
             self.user,
             "Ganho de XP",
-            f"Você ganhou {quantidade} XP.",
+            f"Você ganhou +{quantidade} XP por concluir uma missão!",
             Notificacao.TIPO_XP,
         )
 
@@ -39,7 +39,7 @@ class Avatar(models.Model):
             enviar_notificacao(
                 self.user,
                 "Subiu de nível",
-                f"Você alcançou o nível {self.nivel}!",
+                f"Parabéns! Você alcançou o nível {self.nivel}!",
                 Notificacao.TIPO_NIVEL,
             )
 
