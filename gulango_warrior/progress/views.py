@@ -22,7 +22,8 @@ def missoes_do_dia(request):
             usuario=request.user, missao=missao, data=hoje
         )
         if not usuario_missao.concluida and _avaliar_condicao(missao.condicao, avatar):
-            avatar.ganhar_xp(missao.xp_recompensa)
+            linguagem = request.POST.get("linguagem")
+            avatar.ganhar_xp(missao.xp_recompensa, linguagem=linguagem)
             avatar.moedas += missao.moedas_recompensa
             avatar.save()
             usuario_missao.concluida = True

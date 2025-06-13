@@ -17,16 +17,28 @@ class Avatar(models.Model):
     xp_total = models.IntegerField(default=0)
     moedas = models.IntegerField(default=0)
 
-    def ganhar_xp(self, quantidade: int) -> None:
-        """Incrementa o XP do avatar e dispara notificações."""
+    def ganhar_xp(self, quantidade: int, linguagem: str | None = None) -> None:
+        """Incrementa o XP do avatar, atualizando conquistas e progresso.
 
-        from progress.utils import verificar_conquistas, enviar_notificacao
+        Se ``linguagem`` for fornecida, o progresso do usuário na
+        :class:`~progress.models.ProgressoPorLinguagem` correspondente é
+        criado ou atualizado com o XP recebido.
+        """
+
+        from progress.utils import (
+            verificar_conquistas,
+            enviar_notificacao,
+            atualizar_progresso_linguagem,
+        )
 
         nivel_anterior = self.nivel
         self.xp_total += quantidade
         while self.xp_total >= self.nivel * 100:
             self.nivel += 1
         self.save()
+
+        if linguagem:
+            atualizar_progresso_linguagem(self.user, linguagem, quantidade)
 
         enviar_notificacao(
             self.user,

@@ -20,6 +20,7 @@ from .models import (
     UsuarioMissao,
     LessonProgress,
     Notificacao,
+    ProgressoPorLinguagem,
 )
 from avatars.models import Avatar
 
@@ -51,6 +52,25 @@ def enviar_notificacao(usuario, titulo: str, mensagem: str, tipo: str) -> None:
         mensagem=mensagem,
         tipo=tipo,
     )
+
+
+def atualizar_progresso_linguagem(usuario, linguagem: str, xp: int) -> None:
+    """Incrementa o XP do ``usuario`` em ``linguagem``.
+
+    Cria um registro :class:`~progress.models.ProgressoPorLinguagem` caso
+    ainda não exista para a combinação usuário/linguagem.
+    """
+
+    progresso, created = ProgressoPorLinguagem.objects.get_or_create(
+        usuario=usuario,
+        linguagem=linguagem,
+        defaults={"xp_total": xp, "nivel": 1},
+    )
+    if not created:
+        progresso.xp_total += xp
+        while progresso.xp_total >= progresso.nivel * 100:
+            progresso.nivel += 1
+    progresso.save()
 
 
 def _safe_eval(expr: str, variables: Dict[str, Any]) -> Any:
@@ -166,7 +186,10 @@ def verificar_missoes_automaticas(
             continue
 
         if _avaliar_condicao(missao.condicao, avatar, contexto_extra):
-            avatar.ganhar_xp(missao.xp_recompensa)
+            linguagem = None
+            if contexto_extra:
+                linguagem = contexto_extra.get("linguagem")
+            avatar.ganhar_xp(missao.xp_recompensa, linguagem=linguagem)
             avatar.moedas += missao.moedas_recompensa
             avatar.save()
             usuario_missao.concluida = True

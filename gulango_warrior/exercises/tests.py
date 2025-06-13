@@ -5,6 +5,7 @@ from accounts.models import CustomUser
 from avatars.models import Avatar
 from courses.models import Course, Lesson
 from .models import Exercise
+from progress.models import ProgressoPorLinguagem
 
 
 class CodeExecutorTests(TestCase):
@@ -43,6 +44,10 @@ class CodeExecutorTests(TestCase):
         self.assertContains(response, "ok")
         avatar = Avatar.objects.get(user=self.user)
         self.assertEqual(avatar.xp_total, 5)
+        progresso = ProgressoPorLinguagem.objects.get(
+            usuario=self.user, linguagem=Course.LING_GOLANG
+        )
+        self.assertEqual(progresso.xp_total, 5)
 
     def test_get_does_not_execute(self):
         self.client.login(username="dev", password="pw")
@@ -51,3 +56,8 @@ class CodeExecutorTests(TestCase):
         )
         avatar = Avatar.objects.get(user=self.user)
         self.assertEqual(avatar.xp_total, 0)
+        self.assertFalse(
+            ProgressoPorLinguagem.objects.filter(
+                usuario=self.user, linguagem=Course.LING_GOLANG
+            ).exists()
+        )
